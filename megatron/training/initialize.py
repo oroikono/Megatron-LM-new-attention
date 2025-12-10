@@ -290,15 +290,32 @@ def _initialize_distributed(get_embedding_ranks, get_position_embedding_ranks):
         else:
             device_id = None
 
-        # Call the init process
-        init_process_group_kwargs = {
-            'backend' : args.distributed_backend,
-            'world_size': args.world_size,
-            'rank': args.rank,
-            'timeout': timedelta(minutes=args.distributed_timeout_minutes),
-        }
+        # [SEMIGROUP] Single-GPU mode: use gloo to avoid NCCL/UCX issues.
+        if args.world_size == 1:
+            if args.rank == 0:
+                print("> [SEMIGROUP] world_size=1: using gloo backend, no DDP", flush=True)
+            args.distributed_backend = 'gloo'
+            if device_count > 0:
+                local_rank = getattr(args, 'local_rank', 0)
+                torch.cuda.set_device(local_rank)
+            torch.distributed.init_process_group(
+                backend=args.distributed_backend,
+                world_size=1,
+                rank=0,
+                timeout=timedelta(minutes=args.distributed_timeout_minutes),
+            )
+            args.rank = 0
+            args.world_size = 1
+        else:
+            # Call the init process
+            init_process_group_kwargs = {
+                'backend' : args.distributed_backend,
+                'world_size': args.world_size,
+                'rank': args.rank,
+                'timeout': timedelta(minutes=args.distributed_timeout_minutes),
+            }
 
-        torch.distributed.init_process_group(**init_process_group_kwargs)
+            torch.distributed.init_process_group(**init_process_group_kwargs)
 
     # Set the tensor model-parallel, pipeline model-parallel, and
     # data-parallel communicators.

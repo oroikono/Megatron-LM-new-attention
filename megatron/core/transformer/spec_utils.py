@@ -30,10 +30,41 @@ class ModuleSpec:
 def import_module(module_path: Tuple[str]):
     """Import a named object from a module in the context of this function.
 
-    TODO: make this importer module more robust, at least make sure there
-    are no side effects of using this as is
+    `module_path` can be provided in multiple equivalent forms:
+      * (base_path, name) tuple or list, e.g. ("pkg.mod", "fn")
+      * ["base_path", "name"] list from argparse `--spec base_path name`
+      * single dotted string "base_path.name" from `--spec base_path.name`
     """
-    base_path, name = module_path
+
+    # Normalize `module_path` to a (base_path, name) pair.
+    if isinstance(module_path, (list, tuple)):
+        if len(module_path) == 2:
+            base_path, name = module_path
+        elif len(module_path) == 1:
+            # Support the common case where argparse `nargs='*'` captured a
+            # single dotted string such as
+            #   --spec megatron.core.models.gpt.gpt_layer_specs.get_gpt_layer_semigroup_spec
+            dotted = module_path[0]
+            if not isinstance(dotted, str) or "." not in dotted:
+                raise ValueError(
+                    f"spec must be provided as '<module>.<name>' or '<module> <name>', got: {module_path}"
+                )
+            base_path, name = dotted.rsplit(".", 1)
+        else:
+            raise ValueError(
+                f"spec must be a 2-tuple ('module', 'name') or a single dotted string, got: {module_path}"
+            )
+    elif isinstance(module_path, str):
+        if "." not in module_path:
+            raise ValueError(
+                f"spec string must be of form 'module.name', got: {module_path}"
+            )
+        base_path, name = module_path.rsplit(".", 1)
+    else:
+        raise TypeError(
+            f"module_path must be tuple, list, or str, got type {type(module_path)}"
+        )
+
     try:
         module = __import__(base_path, globals(), locals(), [name])
     except ImportError as e:

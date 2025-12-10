@@ -16,6 +16,7 @@ from megatron.core.transformer.multi_latent_attention import (
     MLASelfAttention,
     MLASelfAttentionSubmodules,
 )
+from megatron.core.transformer.semigroup_attention import SemigroupSelfAttentionMegatron
 from megatron.core.transformer.spec_utils import ModuleSpec
 from megatron.core.transformer.transformer_block import (
     TransformerBlockSubmodules,
@@ -275,6 +276,56 @@ def get_gpt_layer_local_spec(
                 },
             ),
         )
+
+
+def get_gpt_layer_semigroup_spec(
+    num_experts: Optional[int] = None,
+    moe_grouped_gemm: Optional[bool] = False,
+    qk_layernorm: Optional[bool] = False,
+    multi_latent_attention: Optional[bool] = False,
+    fp8: Optional[str] = None,  # pylint: disable=unused-arguments
+    moe_use_legacy_grouped_gemm: Optional[bool] = False,
+) -> ModuleSpec:
+    """GPT layer spec that swaps standard self-attention for semigroup attention.
+
+    This is a TP=1-only experimental spec intended for small-scale runs.
+    It mirrors ``get_gpt_layer_local_spec`` but uses ``SemigroupSelfAttentionMegatron``
+    instead of ``SelfAttention`` and keeps the standard MLP.
+    """
+    if fp8 is not None:
+        warnings.warn(
+            'The fp8 argument in "get_gpt_layer_semigroup_spec" has been deprecated'
+            ' and will be removed soon. Please update your code accordingly.'
+        )
+
+    if num_experts is not None:
+        raise ValueError("Semigroup spec currently supports only dense (non-MoE) layers")
+
+    if multi_latent_attention:
+        raise ValueError("Semigroup spec does not support multi_latent_attention yet")
+
+    mlp = get_mlp_module_spec(
+        use_te=False,
+        num_experts=None,
+        moe_grouped_gemm=moe_grouped_gemm,
+        moe_use_legacy_grouped_gemm=moe_use_legacy_grouped_gemm,
+    )
+
+    return ModuleSpec(
+        module=TransformerLayer,
+        submodules=TransformerLayerSubmodules(
+            input_layernorm=LNImpl,
+            self_attention=ModuleSpec(
+                module=SemigroupSelfAttentionMegatron,
+                params={"attn_mask_type": AttnMaskType.causal},
+                submodules=None,
+            ),
+            self_attn_bda=get_bias_dropout_add,
+            pre_mlp_layernorm=LNImpl,
+            mlp=mlp,
+            mlp_bda=get_bias_dropout_add,
+        ),
+    )
 
 
 def _get_mlp_module_spec(

@@ -244,6 +244,12 @@ def finalize_model_grads(model: List[torch.nn.Module], num_tokens: Optional[torc
 
     config = get_model_config(model[0])
 
+    # [SEMIGROUP] Single-GPU mode: skip gradient all-reduce.
+    dp_world_size = parallel_state.get_data_parallel_world_size()
+    pg_world_size = torch.distributed.get_world_size() if torch.distributed.is_initialized() else 0
+    if dp_world_size <= 1 or pg_world_size <= 1:
+        return
+
     # All-reduce / reduce-scatter across DP replicas.
     if config.timers is not None:
         config.timers('all-grads-sync', log_level=1).start(barrier=config.barrier_with_L1_time)

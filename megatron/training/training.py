@@ -600,6 +600,12 @@ def get_model(model_provider_func, model_type=ModelType.encoder_or_decoder, wrap
                 else:
                     fp8_meta.amax_history[0][fp8_meta_index] = 0
 
+    # [SEMIGROUP] Single-GPU mode: skip DDP wrapper.
+    if args.world_size == 1:
+        if args.rank == 0:
+            print("> [SEMIGROUP] world_size=1: skipping DDP", flush=True)
+        wrap_with_ddp = False
+
     if wrap_with_ddp:
         if getattr(args, "use_torch_fsdp2", False):
             assert HAVE_FSDP2, "Torch FSDP2 requires torch>=2.4.0"
@@ -805,7 +811,9 @@ def train_step(forward_step_func, data_iterator,
     while rerun_state_machine.should_run_forward_backward(data_iterator):
         # Set grad to zero.
         for model_chunk in model:
-            model_chunk.zero_grad_buffer()
+            # [SEMIGROUP] Only call if DDP-wrapped (has this method).
+            if hasattr(model_chunk, 'zero_grad_buffer'):
+                model_chunk.zero_grad_buffer()
         optimizer.zero_grad()
 
         # Forward pass.

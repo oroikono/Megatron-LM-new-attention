@@ -80,7 +80,14 @@ def model_provider(pre_process=True, post_process=True) -> Union[GPTModel, megat
         )
     else: # using core models
         if args.spec is not None:
-            transformer_layer_spec = import_module(args.spec)
+            # Experimental customization feature:
+            # --spec typically points to a function that returns a
+            # Transformer layer/block spec (e.g., get_gpt_layer_local_spec).
+            # Normalize such callables by invoking them here so downstream
+            # code always sees a spec object (ModuleSpec or
+            # TransformerBlockSubmodules), not the function itself.
+            _spec_obj = import_module(args.spec)
+            transformer_layer_spec = _spec_obj() if callable(_spec_obj) else _spec_obj
         else:
             if args.num_experts:
                 # Define the decoder block spec
