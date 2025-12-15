@@ -43,7 +43,7 @@ class SemigroupSelfAttentionMegatron(MegatronModule):
         # this wrapper generic and robust, prefer that attribute when it
         # exists and fall back to a conservative value (sufficient for our
         # small smoke tests which use seq_length=128).
-        block_size = getattr(config, "max_position_embeddings", 128)
+        block_size = getattr(config, "max_position_embeddings", 2048)
 
         # Map Megatron config to semigroup attention hyperparameters.
         self.semigroup_attn = CausalSemigroupSelfAttentionSelective(
