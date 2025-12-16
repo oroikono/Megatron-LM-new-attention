@@ -351,7 +351,7 @@ class TransformerLayer(MegatronModule, BaseTransformerLayer):
             "Please use get_transformer_layer_offset instead."
         )
         return get_transformer_layer_offset(config)
-
+        
     def _forward_semigroup(
         self, 
         hidden_states, 
@@ -369,8 +369,8 @@ class TransformerLayer(MegatronModule, BaseTransformerLayer):
         z = LN1(x)
         y = Attn(z)
         eta = sigmoid(step)
-        m = MLP(LN2(x))
-        out = (1-eta)*z + eta * (y * m)
+        y = (1-eta)*z + eta * y
+        out = MLP(LN2(y))
         """
         
         # 1. Attention Branch: z = LN1(x) -> y = Attn(z)
@@ -395,24 +395,24 @@ class TransformerLayer(MegatronModule, BaseTransformerLayer):
         # Optional dropout for Attn output
         y = F.dropout(y, p=self.hidden_dropout, training=self.training)
 
-        # 2. MLP Branch: ln2_out = LN2(x) -> m = MLP(ln2_out)
-        # Note: Input to this branch is 'x' (hidden_states), not 'z'
-        ln2_out = self.pre_mlp_layernorm(hidden_states)
-        
-        m, bias_mlp = self.mlp(ln2_out)
-        if bias_mlp is not None:
-            m = m + bias_mlp
-            
-        # Optional dropout for MLP output
-        m = F.dropout(m, p=self.hidden_dropout, training=self.training)
 
-        # 3. Calculate Step (eta)
+        # 2. Calculate Step (eta)
         eta = torch.sigmoid(self.step)
 
-        # 4. Multiplicative Fusion
-        # out = (1 - eta) * z + eta * (y * m)
-        update = y * m
-        output = (1.0 - eta) * z + eta * update
+        # 3. Multiplicative Fusion
+        y = (1.0 - eta) * z + eta * y
+
+        # 4. MLP Branch: ln2_out = LN2(x) -> m = MLP(ln2_out)
+        # Note: Input to this branch is 'x' (hidden_states), not 'z'
+        ln2_out = self.pre_mlp_layernorm(y)
+        
+        output, bias_mlp = self.mlp(ln2_out)
+        if bias_mlp is not None:
+            output = output + bias_mlp
+            
+        # Optional dropout for MLP output
+        output = F.dropout(output, p=self.hidden_dropout, training=self.training)
+
 
         # Finalize
         output = make_viewless_tensor(
