@@ -6,6 +6,7 @@ from typing import Dict, Optional, Union
 
 import torch
 import torch.distributed
+import torch.nn.functional as F
 
 from megatron.core import parallel_state
 from megatron.core.dist_checkpointing.mapping import ShardedStateDict
@@ -160,12 +161,12 @@ def get_transformer_layer_offset(config: TransformerConfig):
             else:
                 offset = pipeline_rank * num_layers_per_pipeline_rank
 
-                # Reduce the offset of embedding layer from the total layer number
-                if (
-                    config.account_for_embedding_in_pipeline_split
-                    and not parallel_state.is_pipeline_first_stage()
-                ):
-                    offset -= 1
+            # Reduce the offset of embedding layer from the total layer number
+            if (
+                config.account_for_embedding_in_pipeline_split
+                and not parallel_state.is_pipeline_first_stage()
+            ):
+                offset -= 1
     else:
         offset = 0
     return offset
@@ -244,10 +245,17 @@ class TransformerLayer(MegatronModule, BaseTransformerLayer):
         submodules: TransformerLayerSubmodules,
         layer_number: int = 1,
         hidden_dropout: float = None,
-        # NEW: Add eta parameter. Default to None to preserve legacy behavior.
-        semigroup_eta: float = None 
+        # NEW: Optional step_init. If None, uses standard Megatron logic.
+        step_init: float = None, 
     ):
         super().__init__(config=config)
+
+        # Semigroup step parameter initialization
+        self.step_init = step_init
+        if self.step_init is not None:
+            self.step = torch.nn.Parameter(torch.tensor(float(step_init)))
+        else:
+            self.step = None
 
         if config.enable_cuda_graph:
             if not self.training:
@@ -344,6 +352,75 @@ class TransformerLayer(MegatronModule, BaseTransformerLayer):
         )
         return get_transformer_layer_offset(config)
 
+    def _forward_semigroup(
+        self, 
+        hidden_states, 
+        attention_mask, 
+        inference_params, 
+        rotary_pos_emb, 
+        rotary_pos_cos, 
+        rotary_pos_sin, 
+        attention_bias, 
+        packed_seq_params, 
+        sequence_len_offset
+    ):
+        """
+        Implementation of the Semigroup Multiplicative Logic:
+        z = LN1(x)
+        y = Attn(z)
+        eta = sigmoid(step)
+        m = MLP(LN2(x))
+        out = (1-eta)*z + eta * (y * m)
+        """
+        
+        # 1. Attention Branch: z = LN1(x) -> y = Attn(z)
+        # We perform input layernorm on 'x' (hidden_states)
+        z = self.input_layernorm(hidden_states)
+        
+        # Self attention
+        y, bias_attn = self.self_attention(
+            z,
+            attention_mask=attention_mask,
+            inference_params=inference_params,
+            rotary_pos_emb=rotary_pos_emb,
+            rotary_pos_cos=rotary_pos_cos,
+            rotary_pos_sin=rotary_pos_sin,
+            attention_bias=attention_bias,
+            packed_seq_params=packed_seq_params,
+            sequence_len_offset=sequence_len_offset,
+        )
+        if bias_attn is not None:
+            y = y + bias_attn
+            
+        # Optional dropout for Attn output
+        y = F.dropout(y, p=self.hidden_dropout, training=self.training)
+
+        # 2. MLP Branch: ln2_out = LN2(x) -> m = MLP(ln2_out)
+        # Note: Input to this branch is 'x' (hidden_states), not 'z'
+        ln2_out = self.pre_mlp_layernorm(hidden_states)
+        
+        m, bias_mlp = self.mlp(ln2_out)
+        if bias_mlp is not None:
+            m = m + bias_mlp
+            
+        # Optional dropout for MLP output
+        m = F.dropout(m, p=self.hidden_dropout, training=self.training)
+
+        # 3. Calculate Step (eta)
+        eta = torch.sigmoid(self.step)
+
+        # 4. Multiplicative Fusion
+        # out = (1 - eta) * z + eta * (y * m)
+        update = y * m
+        output = (1.0 - eta) * z + eta * update
+
+        # Finalize
+        output = make_viewless_tensor(
+            inp=output, requires_grad=output.requires_grad, keep_graph=True
+        )
+
+        return output
+
     def forward(
         self,
         hidden_states,
@@ -358,20 +435,65 @@ class TransformerLayer(MegatronModule, BaseTransformerLayer):
         packed_seq_params=None,
         sequence_len_offset=None,
     ):
-        
-        # -----------------------------------------------------------
-        # BLOCK 1: SELF ATTENTION
-        # -----------------------------------------------------------
-        
-        # In Semigroup theory, we don't carry the "raw" residual.
-        # We act upon the Normalized Input.
-        residual = hidden_states 
+        """
+        Perform a forward pass through the transformer layer.
 
+        This method implements the core computation of a transformer layer, including
+        self-attention, cross-attention (if applicable), and feed-forward operations.
+
+        Args:
+            hidden_states (Tensor): Input tensor of shape [s, b, h] where s is sequence length,
+                b is batch size, and h is hidden size.
+            attention_mask (Tensor): Mask tensor for self-attention.
+            context (Tensor, optional): Context tensor for cross-attention.
+            context_mask (Tensor, optional): Mask tensor for cross-attention.
+            rotary_pos_emb (Tensor, optional): Rotary positional embeddings.
+            attention_bias (Tensor, optional): Bias tensor for Q * K.T.
+            inference_params (object, optional): Parameters for inference-time optimizations.
+            packed_seq_params (object, optional): Parameters for packed sequence processing.
+
+        Returns:
+            Tuple[Tensor, Tensor]: A tuple containing:
+                output (Tensor): Transformed hidden states of shape [s, b, h].
+                context (Tensor): Updated context tensor if cross-attention is used,
+                    otherwise None.
+        """
+
+        # --- MODIFIED: Check for Semigroup Mode ---
+        if self.step_init is not None:
+            output = self._forward_semigroup(
+                hidden_states=hidden_states,
+                attention_mask=attention_mask,
+                inference_params=inference_params,
+                rotary_pos_emb=rotary_pos_emb,
+                rotary_pos_cos=rotary_pos_cos,
+                rotary_pos_sin=rotary_pos_sin,
+                attention_bias=attention_bias,
+                packed_seq_params=packed_seq_params,
+                sequence_len_offset=sequence_len_offset
+            )
+            # Semigroup mode as defined doesn't use cross-attention explicitly in the instruction.
+            # We return context if it was passed (though likely None for Decoder-only).
+            if self.config.external_cuda_graph and self.training:
+                return output
+            return output, context
+        # --- END MODIFIED ---
+
+        # =============================================================================
+        # STANDARD MEGATRON FORWARD PASS (Backwards Compatibility)
+        # =============================================================================
+        
+        # Residual connection.
+        residual = hidden_states
+
+        # Optional Input Layer norm
         input_layernorm_output = self.input_layernorm(hidden_states)
-        
-        # If we are doing Semigroup, the "Base" for the addition is the Normalized input
-        # Otherwise, for standard Transformer, the "Base" is the raw residual (hidden_states)
-        
+
+        if not self.config.post_layer_norm:
+            input_layernorm_output = self.input_layernorm(hidden_states)
+        else:
+            input_layernorm_output = hidden_states
+
         # Self attention.
         attention_output, bias = self.self_attention(
             input_layernorm_output,
@@ -390,40 +512,20 @@ class TransformerLayer(MegatronModule, BaseTransformerLayer):
             assert bias is None
         attention_output_with_bias = (attention_output, bias)
 
-        # --- MODIFICATION START ---
-        if self.semigroup_eta is not None:
-            # Semigroup logic: Output = (1 - eta) * Norm(x) + eta * Attn(Norm(x))
-            
-            # 1. Apply Bias (manually, since we aren't using the fused kernel)
-            if bias is not None:
-                attention_output = attention_output + bias
-            
-            # 2. Apply Dropout
-            attention_output = torch.nn.functional.dropout(
-                attention_output, 
-                p=self.hidden_dropout, 
-                training=self.training
+        # TODO: could we move `bias_dropout_add_exec_handler` itself
+        # inside the module provided in the `bias_dropout_add_spec` module?
+        with self.bias_dropout_add_exec_handler():
+            hidden_states = self.self_attn_bda(self.training, self.config.bias_dropout_fusion)(
+                attention_output_with_bias, residual, self.hidden_dropout
             )
 
-            # 3. Apply Convex Combination (Mixing)
-            # Note: We use input_layernorm_output as the residual base, not the raw 'residual' variable
-            hidden_states = (1.0 - self.semigroup_eta) * input_layernorm_output + self.semigroup_eta * attention_output
-            
-        else:
-            # Standard Megatron Logic (Bias + Dropout + Add Residual)
-            with self.bias_dropout_add_exec_handler():
-                hidden_states = self.self_attn_bda(self.training, self.config.bias_dropout_fusion)(
-                    attention_output_with_bias, residual, self.hidden_dropout
-                )
-        # --- MODIFICATION END ---
-
-        # -----------------------------------------------------------
-        # BLOCK 2: CROSS ATTENTION (If applicable)
-        # -----------------------------------------------------------
-        
+        # Residual connection.
         residual = hidden_states
+
+        # Optional Layer norm after self-attention
         pre_cross_attn_layernorm_output = self.pre_cross_attn_layernorm(hidden_states)
 
+        # Cross attention.
         attention_output_with_bias = self.cross_attention(
             pre_cross_attn_layernorm_output,
             attention_mask=context_mask,
@@ -434,65 +536,46 @@ class TransformerLayer(MegatronModule, BaseTransformerLayer):
         if isinstance(attention_output_with_bias, dict) and "context" in attention_output_with_bias:
             context = attention_output_with_bias["context"]
 
-        # --- MODIFICATION START ---
-        if self.semigroup_eta is not None:
-            # Extract output and bias if tuple
-            if isinstance(attention_output_with_bias, tuple):
-                attn_out, attn_bias = attention_output_with_bias
-            else:
-                attn_out, attn_bias = attention_output_with_bias, None
-                
-            if attn_bias is not None:
-                attn_out = attn_out + attn_bias
-                
-            attn_out = torch.nn.functional.dropout(attn_out, p=self.hidden_dropout, training=self.training)
-            
-            # Semigroup Mix
-            hidden_states = (1.0 - self.semigroup_eta) * pre_cross_attn_layernorm_output + self.semigroup_eta * attn_out
-        else:
-            with self.bias_dropout_add_exec_handler():
-                hidden_states = self.cross_attn_bda(self.training, self.config.bias_dropout_fusion)(
-                    attention_output_with_bias, residual, self.hidden_dropout
-                )
-        # --- MODIFICATION END ---
+        # TODO: could we move `bias_dropout_add_exec_handler` itself
+        # inside the module provided in the `bias_dropout_add_spec` module?
+        with self.bias_dropout_add_exec_handler():
+            hidden_states = self.cross_attn_bda(self.training, self.config.bias_dropout_fusion)(
+                attention_output_with_bias, residual, self.hidden_dropout
+            )
 
-        # -----------------------------------------------------------
-        # BLOCK 3: MLP
-        # -----------------------------------------------------------
-        
+        # Residual connection.
         residual = hidden_states
-        
+
+        # Optional Layer norm post the cross-attention.
         if not self.config.post_layer_norm:
             pre_mlp_layernorm_output = self.pre_mlp_layernorm(hidden_states)
         else:
             pre_mlp_layernorm_output = hidden_states
 
+        # MLP.
         mlp_output, bias = self.mlp(pre_mlp_layernorm_output)
-        
         if self.config.post_layer_norm:
             mlp_output = self.pre_mlp_layernorm(mlp_output)
         mlp_output_with_bias = (mlp_output, bias)
 
-        # --- MODIFICATION START ---
-        if self.semigroup_eta is not None:
-            if bias is not None:
-                mlp_output = mlp_output + bias
-            
-            mlp_output = torch.nn.functional.dropout(mlp_output, p=self.hidden_dropout, training=self.training)
-            
-            # Semigroup Mix
-            hidden_states = (1.0 - self.semigroup_eta) * pre_mlp_layernorm_output + self.semigroup_eta * mlp_output
-        else:
-            with self.bias_dropout_add_exec_handler():
-                hidden_states = self.mlp_bda(self.training, self.config.bias_dropout_fusion)(
-                    mlp_output_with_bias, residual, self.hidden_dropout
-                )
-        # --- MODIFICATION END ---
+        # TODO: could we move `bias_dropout_add_exec_handler` itself
+        # inside the module provided in the `bias_dropout_add_spec` module?
+        with self.bias_dropout_add_exec_handler():
+            hidden_states = self.mlp_bda(self.training, self.config.bias_dropout_fusion)(
+                mlp_output_with_bias, residual, self.hidden_dropout
+            )
 
+        # Jit compiled function creates 'view' tensor. This tensor
+        # potentially gets saved in the MPU checkpoint function context,
+        # which rejects view tensors. While making a viewless tensor here
+        # won't result in memory savings (like the data loader, or
+        # p2p_communication), it serves to document the origin of this
+        # 'view' tensor.
         output = make_viewless_tensor(
             inp=hidden_states, requires_grad=hidden_states.requires_grad, keep_graph=True
         )
 
+        # CUDA graph requires returned values to be Tensors
         if self.config.external_cuda_graph and self.training:
             return output
         return output, context

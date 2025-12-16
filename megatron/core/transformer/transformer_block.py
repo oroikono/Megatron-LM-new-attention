@@ -219,7 +219,7 @@ class TransformerBlock(MegatronModule):
         pre_process: bool = True,
         post_process: bool = True,
         # --- MODIFICATION START ---
-        semigroup_eta: float = None, 
+        step_init: float = None, 
         # --- MODIFICATION END ---
     ):
         super().__init__(config=config)
@@ -231,7 +231,7 @@ class TransformerBlock(MegatronModule):
 
         # --- MODIFICATION START ---
         # Store the eta parameter to pass to layers
-        self.semigroup_eta = semigroup_eta
+        self.step_init = step_init
         # --- MODIFICATION END ---
 
         # Dictionary to store CUDA graphs. Number of items in the dictionary = len(self.layers).
@@ -288,7 +288,7 @@ class TransformerBlock(MegatronModule):
                 layer_spec, 
                 config=self.config, 
                 layer_number=layer_number, 
-                semigroup_eta=self.semigroup_eta
+                step_init=self.step_init
             )
         # --- MODIFICATION END ---
 
