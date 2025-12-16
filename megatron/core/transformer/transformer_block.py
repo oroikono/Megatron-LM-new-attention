@@ -218,6 +218,9 @@ class TransformerBlock(MegatronModule):
         final_layer_norm: bool = True,
         pre_process: bool = True,
         post_process: bool = True,
+        # --- MODIFICATION START ---
+        semigroup_eta: float = None, 
+        # --- MODIFICATION END ---
     ):
         super().__init__(config=config)
 
@@ -225,6 +228,12 @@ class TransformerBlock(MegatronModule):
         self.final_layer_norm = final_layer_norm
         self.pre_process = pre_process
         self.post_process = post_process
+
+        # --- MODIFICATION START ---
+        # Store the eta parameter to pass to layers
+        self.semigroup_eta = semigroup_eta
+        # --- MODIFICATION END ---
+
         # Dictionary to store CUDA graphs. Number of items in the dictionary = len(self.layers).
         # Item `i` in the dictionary is a list of `N` CUDA graphs for layer 'i' where N is the
         # number of microbatches. Multiple CUDA graphs per layer is required to support
@@ -271,8 +280,17 @@ class TransformerBlock(MegatronModule):
         # if self.apply_query_key_layer_scaling:
         #     coeff = self.layer_number
         #     self.norm_factor *= coeff
+        # --- MODIFICATION START ---
         def build_layer(layer_spec, layer_number):
-            return build_module(layer_spec, config=self.config, layer_number=layer_number)
+            # We pass semigroup_eta as a kwarg. 
+            # build_module will forward this to the TransformerLayer __init__ we modified previously.
+            return build_module(
+                layer_spec, 
+                config=self.config, 
+                layer_number=layer_number, 
+                semigroup_eta=self.semigroup_eta
+            )
+        # --- MODIFICATION END ---
 
         # offset is implicit in TransformerLayer
         self.layers = torch.nn.ModuleList(
