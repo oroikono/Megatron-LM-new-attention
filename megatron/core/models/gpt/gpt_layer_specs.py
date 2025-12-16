@@ -285,6 +285,7 @@ def get_gpt_layer_semigroup_spec(
     multi_latent_attention: Optional[bool] = False,
     fp8: Optional[str] = None,  # pylint: disable=unused-arguments
     moe_use_legacy_grouped_gemm: Optional[bool] = False,
+    step_init: float = 0.5,
 ) -> ModuleSpec:
     """GPT layer spec that swaps standard self-attention for semigroup attention.
 
@@ -313,6 +314,7 @@ def get_gpt_layer_semigroup_spec(
 
     return ModuleSpec(
         module=TransformerLayer,
+        params={"step_init": step_init},
         submodules=TransformerLayerSubmodules(
             input_layernorm=LNImpl,
             self_attention=ModuleSpec(

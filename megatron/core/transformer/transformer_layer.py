@@ -6,6 +6,7 @@ from typing import Dict, Optional, Union
 
 import torch
 import torch.distributed
+import torch.nn.functional as F
 
 from megatron.core import parallel_state
 from megatron.core.dist_checkpointing.mapping import ShardedStateDict
@@ -244,8 +245,17 @@ class TransformerLayer(MegatronModule, BaseTransformerLayer):
         submodules: TransformerLayerSubmodules,
         layer_number: int = 1,
         hidden_dropout: float = None,
+        # Optional semigroup step init. If None, standard path is used.
+        step_init: float = None,
     ):
         super().__init__(config=config)
+
+        # Semigroup step parameter (learnable scalar in (0,1) via sigmoid)
+        self.step_init = step_init
+        if self.step_init is not None:
+            self.step = torch.nn.Parameter(torch.tensor(float(step_init)))
+        else:
+            self.step = None
 
         if config.enable_cuda_graph:
             if not self.training:
@@ -342,6 +352,54 @@ class TransformerLayer(MegatronModule, BaseTransformerLayer):
         )
         return get_transformer_layer_offset(config)
 
+    def _forward_semigroup(
+        self,
+        hidden_states,
+        attention_mask,
+        inference_params,
+        rotary_pos_emb,
+        rotary_pos_cos,
+        rotary_pos_sin,
+        attention_bias,
+        packed_seq_params,
+        sequence_len_offset,
+    ):
+        """
+        Semigroup residual: z = LN1(x); y = Attn(z); eta = sigmoid(step);
+        y <- (1 - eta) * z + eta * y; out = MLP(LN2(y)).
+        """
+
+        z = self.input_layernorm(hidden_states)
+        y, bias_attn = self.self_attention(
+            z,
+            attention_mask=attention_mask,
+            inference_params=inference_params,
+            rotary_pos_emb=rotary_pos_emb,
+            rotary_pos_cos=rotary_pos_cos,
+            rotary_pos_sin=rotary_pos_sin,
+            attention_bias=attention_bias,
+            packed_seq_params=packed_seq_params,
+            sequence_len_offset=sequence_len_offset,
+        )
+        if bias_attn is not None:
+            y = y + bias_attn
+
+        y = F.dropout(y, p=self.hidden_dropout, training=self.training)
+
+        eta = torch.sigmoid(self.step)
+        y = (1.0 - eta) * z + eta * y
+
+        ln2_out = self.pre_mlp_layernorm(y)
+        output, bias_mlp = self.mlp(ln2_out)
+        if bias_mlp is not None:
+            output = output + bias_mlp
+
+        output = F.dropout(output, p=self.hidden_dropout, training=self.training)
+        output = make_viewless_tensor(
+            inp=output, requires_grad=output.requires_grad, keep_graph=True
+        )
+        return output
+
     def forward(
         self,
         hidden_states,
@@ -379,6 +437,23 @@ class TransformerLayer(MegatronModule, BaseTransformerLayer):
                 context (Tensor): Updated context tensor if cross-attention is used,
                 otherwise None.
         """
+
+        # Semigroup path if step is provided
+        if self.step_init is not None:
+            output = self._forward_semigroup(
+                hidden_states=hidden_states,
+                attention_mask=attention_mask,
+                inference_params=inference_params,
+                rotary_pos_emb=rotary_pos_emb,
+                rotary_pos_cos=rotary_pos_cos,
+                rotary_pos_sin=rotary_pos_sin,
+                attention_bias=attention_bias,
+                packed_seq_params=packed_seq_params,
+                sequence_len_offset=sequence_len_offset,
+            )
+            if self.config.external_cuda_graph and self.training:
+                return output
+            return output, context
 
         # Residual connection.
         residual = hidden_states
