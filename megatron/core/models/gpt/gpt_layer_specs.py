@@ -285,7 +285,6 @@ def get_gpt_layer_semigroup_spec(
     multi_latent_attention: Optional[bool] = False,
     fp8: Optional[str] = None,  # pylint: disable=unused-arguments
     moe_use_legacy_grouped_gemm: Optional[bool] = False,
-    step_init: float = 0.5,
 ) -> ModuleSpec:
     """GPT layer spec that swaps standard self-attention for semigroup attention.
 
@@ -314,7 +313,6 @@ def get_gpt_layer_semigroup_spec(
 
     return ModuleSpec(
         module=TransformerLayer,
-        params={"step_init": step_init},
         submodules=TransformerLayerSubmodules(
             input_layernorm=LNImpl,
             self_attention=ModuleSpec(
@@ -479,3 +477,39 @@ def get_gpt_decoder_block_spec(
     block_spec = TransformerBlockSubmodules(layer_specs=layer_specs, layer_norm=layer_norm_impl)
 
     return block_spec
+
+
+def get_gpt_layer_hybrid_spec(
+    num_layers: int = 28,
+    softmax_ratio: int = 2,  # Number of softmax layers per semigroup layer
+) -> TransformerBlockSubmodules:
+    """Hybrid GPT layer spec: alternating softmax and semigroup attention.
+    
+    Pattern: [softmax] * softmax_ratio + [semigroup], repeated.
+    Example with softmax_ratio=2 and 28 layers:
+        softmax, softmax, semigroup, softmax, softmax, semigroup, ...
+        (18 softmax + 9 semigroup + 1 softmax = 28 layers)
+    
+    This is George's experiment to see if semigroup stabilizes softmax.
+    """
+    from megatron.core.transformer.torch_norm import WrappedTorchNorm
+    
+    softmax_spec = get_gpt_layer_local_spec()
+    semigroup_spec = get_gpt_layer_semigroup_spec()
+    
+    layer_specs = []
+    pattern_length = softmax_ratio + 1  # e.g., 2 softmax + 1 semigroup = 3
+    
+    for i in range(num_layers):
+        position_in_pattern = i % pattern_length
+        if position_in_pattern < softmax_ratio:
+            layer_specs.append(softmax_spec)
+        else:
+            layer_specs.append(semigroup_spec)
+    
+    # Count for logging
+    n_softmax = sum(1 for s in layer_specs if s == softmax_spec)
+    n_semigroup = num_layers - n_softmax
+    print(f"[Hybrid Spec] {num_layers} layers: {n_softmax} softmax + {n_semigroup} semigroup (pattern: {softmax_ratio}:1)")
+    
+    return TransformerBlockSubmodules(layer_specs=layer_specs, layer_norm=WrappedTorchNorm)

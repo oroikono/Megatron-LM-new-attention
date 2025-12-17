@@ -46,6 +46,10 @@ class SemigroupSelfAttentionMegatron(MegatronModule):
         block_size = getattr(config, "max_position_embeddings", 2048)
 
         # Map Megatron config to semigroup attention hyperparameters.
+        # dt = 1/n_layers for proper semigroup dynamics (George's fix)
+        n_layers = getattr(config, 'num_layers', 28)
+        dt = 1.0 / n_layers
+        
         self.semigroup_attn = CausalSemigroupSelfAttentionSelective(
             n_embd=config.hidden_size,
             n_head=config.num_attention_heads,
@@ -57,13 +61,14 @@ class SemigroupSelfAttentionMegatron(MegatronModule):
             esr_alpha=0.08,
             dropout=float(config.hidden_dropout),
             bias=False,
+            dt=dt,  # Critical: dt=1/n_layers for one full step across stack
         )
 
         if parallel_state.get_tensor_model_parallel_rank() == 0:
             print(
                 f"[SemigroupSelfAttentionMegatron] Initialized on layer {layer_number} "
                 f"with hidden_size={config.hidden_size}, num_heads={config.num_attention_heads}, "
-                f"max_seq={block_size}"
+                f"max_seq={block_size}, dt={dt:.4f} (1/{n_layers} layers)"
             )
 
     def forward(
