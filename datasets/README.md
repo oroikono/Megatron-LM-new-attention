@@ -1,6 +1,6 @@
 # Training Dataset
 
-The Megatron-format training data files are too large for git.
+The Megatron-format training data files are too large for git so I did git lfs
 
 ## Files needed:
 - `train_data_meg_text_document.bin` (3.2 GB)
