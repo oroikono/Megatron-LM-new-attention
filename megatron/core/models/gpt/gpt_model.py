@@ -133,6 +133,12 @@ class GPTModel(LanguageModule):
         # Cache for RoPE tensors which do not change between iterations.
         self.rotary_pos_emb_cache = {}
 
+        # Determine step_init for semigroup transformer
+        # DISABLED: Using standard Megatron forward path with semigroup attention
+        # If using semigroup spec, enable the semigroup forward path
+        # step_init = 0.5 if 'semigroup' in str(transformer_layer_spec).lower() else None
+        step_init = None  # Use standard Megatron forward
+
         # Transformer.
         self.decoder = TransformerBlock(
             config=self.config,
@@ -140,6 +146,7 @@ class GPTModel(LanguageModule):
             pre_process=self.pre_process,
             post_process=self.post_process,
             final_layer_norm=self.final_layernorm,
+            step_init=step_init,
         )
 
         # Output

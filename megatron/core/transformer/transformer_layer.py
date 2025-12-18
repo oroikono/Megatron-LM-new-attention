@@ -161,12 +161,12 @@ def get_transformer_layer_offset(config: TransformerConfig):
             else:
                 offset = pipeline_rank * num_layers_per_pipeline_rank
 
-                # Reduce the offset of embedding layer from the total layer number
-                if (
-                    config.account_for_embedding_in_pipeline_split
-                    and not parallel_state.is_pipeline_first_stage()
-                ):
-                    offset -= 1
+            # Reduce the offset of embedding layer from the total layer number
+            if (
+                config.account_for_embedding_in_pipeline_split
+                and not parallel_state.is_pipeline_first_stage()
+            ):
+                offset -= 1
     else:
         offset = 0
     return offset
@@ -245,12 +245,12 @@ class TransformerLayer(MegatronModule, BaseTransformerLayer):
         submodules: TransformerLayerSubmodules,
         layer_number: int = 1,
         hidden_dropout: float = None,
-        # Optional semigroup step init. If None, standard path is used.
-        step_init: float = None,
+        # NEW: Optional step_init. If None, uses standard Megatron logic.
+        step_init: float = None, 
     ):
         super().__init__(config=config)
 
-        # Semigroup step parameter (learnable scalar in (0,1) via sigmoid)
+        # Semigroup step parameter initialization
         self.step_init = step_init
         if self.step_init is not None:
             self.step = torch.nn.Parameter(torch.tensor(float(step_init)))
@@ -351,25 +351,32 @@ class TransformerLayer(MegatronModule, BaseTransformerLayer):
             "Please use get_transformer_layer_offset instead."
         )
         return get_transformer_layer_offset(config)
-
+        
     def _forward_semigroup(
-        self,
-        hidden_states,
-        attention_mask,
-        inference_params,
-        rotary_pos_emb,
-        rotary_pos_cos,
-        rotary_pos_sin,
-        attention_bias,
-        packed_seq_params,
-        sequence_len_offset,
+        self, 
+        hidden_states, 
+        attention_mask, 
+        inference_params, 
+        rotary_pos_emb, 
+        rotary_pos_cos, 
+        rotary_pos_sin, 
+        attention_bias, 
+        packed_seq_params, 
+        sequence_len_offset
     ):
         """
-        Semigroup residual: z = LN1(x); y = Attn(z); eta = sigmoid(step);
-        y <- (1 - eta) * z + eta * y; out = MLP(LN2(y)).
+        Implementation of George's SemiStepBlock (original design):
+        z = LN1(x)
+        y = Attn(z)
+        eta = sigmoid(step)
+        x = (1-eta)*x + eta*y     # Semigroup mixing with UNNORMALIZED x
+        out = x + MLP(LN2(x))     # Standard residual for MLP
         """
-
+        
+        # 1. Attention Branch: z = LN1(x) -> y = Attn(z)
         z = self.input_layernorm(hidden_states)
+        
+        # Self attention
         y, bias_attn = self.self_attention(
             z,
             attention_mask=attention_mask,
@@ -383,21 +390,35 @@ class TransformerLayer(MegatronModule, BaseTransformerLayer):
         )
         if bias_attn is not None:
             y = y + bias_attn
-
+            
+        # Optional dropout for Attn output
         y = F.dropout(y, p=self.hidden_dropout, training=self.training)
 
+
+        # 2. Calculate Step (eta)
         eta = torch.sigmoid(self.step)
-        y = (1.0 - eta) * z + eta * y
 
-        ln2_out = self.pre_mlp_layernorm(y)
-        output, bias_mlp = self.mlp(ln2_out)
+        # 3. Semigroup mixing with UNNORMALIZED x (George's original SemiStepBlock)
+        x = (1.0 - eta) * hidden_states + eta * y
+
+        # 4. MLP Branch with residual: out = x + MLP(LN2(x))
+        ln2_out = self.pre_mlp_layernorm(x)
+        
+        mlp_output, bias_mlp = self.mlp(ln2_out)
         if bias_mlp is not None:
-            output = output + bias_mlp
+            mlp_output = mlp_output + bias_mlp
+            
+        # Optional dropout for MLP output
+        mlp_output = F.dropout(mlp_output, p=self.hidden_dropout, training=self.training)
 
-        output = F.dropout(output, p=self.hidden_dropout, training=self.training)
+        # 5. Add residual connection for MLP (standard transformer behavior)
+        output = x + mlp_output
+
+        # Finalize
         output = make_viewless_tensor(
             inp=output, requires_grad=output.requires_grad, keep_graph=True
         )
+
         return output
 
     def forward(
@@ -435,10 +456,10 @@ class TransformerLayer(MegatronModule, BaseTransformerLayer):
             Tuple[Tensor, Tensor]: A tuple containing:
                 output (Tensor): Transformed hidden states of shape [s, b, h].
                 context (Tensor): Updated context tensor if cross-attention is used,
-                otherwise None.
+                    otherwise None.
         """
 
-        # Semigroup path if step is provided
+        # --- MODIFIED: Check for Semigroup Mode ---
         if self.step_init is not None:
             output = self._forward_semigroup(
                 hidden_states=hidden_states,
@@ -449,12 +470,19 @@ class TransformerLayer(MegatronModule, BaseTransformerLayer):
                 rotary_pos_sin=rotary_pos_sin,
                 attention_bias=attention_bias,
                 packed_seq_params=packed_seq_params,
-                sequence_len_offset=sequence_len_offset,
+                sequence_len_offset=sequence_len_offset
             )
+            # Semigroup mode as defined doesn't use cross-attention explicitly in the instruction.
+            # We return context if it was passed (though likely None for Decoder-only).
             if self.config.external_cuda_graph and self.training:
                 return output
             return output, context
+        # --- END MODIFIED ---
 
+        # =============================================================================
+        # STANDARD MEGATRON FORWARD PASS (Backwards Compatibility)
+        # =============================================================================
+        
         # Residual connection.
         residual = hidden_states
 
