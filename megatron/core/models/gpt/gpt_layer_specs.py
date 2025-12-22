@@ -503,9 +503,9 @@ def get_gpt_layer_hybrid_spec(
     for i in range(num_layers):
         position_in_pattern = i % pattern_length
         if position_in_pattern < softmax_ratio:
-            layer_specs.append(softmax_spec)
-        else:
             layer_specs.append(semigroup_spec)
+        else:
+            layer_specs.append(softmax_spec)
     
     # Count for logging
     n_softmax = sum(1 for s in layer_specs if s == softmax_spec)

@@ -1,0 +1,1110 @@
+===== TEST 3B SEMIGROUP (MOCK DATA) =====
+using world size: 4, data-parallel size: 4, context-parallel size: 1, hierarchical context-parallel sizes: Nonetensor-model-parallel size: 1, encoder-tensor-model-parallel size: 0, pipeline-model-parallel size: 1, encoder-pipeline-model-parallel size: 0
+WARNING: overriding default arguments for tokenizer_type:GPT2BPETokenizer                        with tokenizer_type:NullTokenizer
+accumulate and all-reduce gradients in fp32 for bfloat16 data type.
+using torch.bfloat16 for parameters ...
+Exit trigger setup! run `touch /dev/null/exit` to stop training
+Save trigger setup! run `touch /dev/null/save` to save a checkpoint
+------------------------ arguments ------------------------
+  account_for_embedding_in_pipeline_split ......... False
+  account_for_loss_in_pipeline_split .............. False
+  accumulate_allreduce_grads_in_fp32 .............. True
+  adam_beta1 ...................................... 0.9
+  adam_beta2 ...................................... 0.999
+  adam_eps ........................................ 1e-08
+  add_bias_linear ................................. True
+  add_position_embedding .......................... True
+  add_qkv_bias .................................... True
+  ademamix_alpha .................................. 5
+  ademamix_alpha_warmup ........................... -1
+  ademamix_beta3 .................................. 0.999
+  ademamix_beta3_warmup ........................... -1
+  adlr_autoresume ................................. False
+  adlr_autoresume_interval ........................ 1000
+  align_grad_reduce ............................... True
+  align_param_gather .............................. False
+  app_tag_run_name ................................ None
+  app_tag_run_version ............................. 0.0.0
+  apply_layernorm_1p .............................. False
+  apply_query_key_layer_scaling ................... False
+  apply_residual_connection_post_layernorm ........ False
+  apply_rope_fusion ............................... False
+  async_save ...................................... None
+  async_tensor_model_parallel_allreduce ........... True
+  attention_backend ............................... AttnBackend.auto
+  attention_dropout ............................... 0.1
+  attention_softmax_in_fp32 ....................... False
+  attn_layernorm .................................. True
+  auto_detect_ckpt_format ......................... False
+  barrier_with_L1_time ............................ True
+  bert_binary_head ................................ True
+  bert_embedder_type .............................. megatron
+  bert_load ....................................... None
+  bf16 ............................................ True
+  bias_dropout_fusion ............................. True
+  bias_gelu_fusion ................................ True
+  bias_swiglu_fusion .............................. True
+  biencoder_projection_dim ........................ 0
+  biencoder_shared_query_context_model ............ False
+  block_data_path ................................. None
+  calc_ft_timeouts ................................ False
+  calculate_per_token_loss ........................ False
+  check_for_nan_in_loss_and_grad .................. True
+  check_for_spiky_loss ............................ False
+  check_weight_hash_across_dp_replicas_interval ... None
+  ckpt_assume_constant_structure .................. False
+  ckpt_convert_format ............................. None
+  ckpt_convert_save ............................... None
+  ckpt_convert_update_legacy_dist_opt_format ...... False
+  ckpt_format ..................................... torch_dist
+  ckpt_fully_parallel_load ........................ False
+  ckpt_fully_parallel_save ........................ True
+  ckpt_fully_parallel_save_deprecated ............. False
+  ckpt_step ....................................... None
+  classes_fraction ................................ 1.0
+  clip_grad ....................................... 1.0
+  clone_scatter_output_in_embedding ............... True
+  config_logger_dir ............................... 
+  consumed_train_samples .......................... 0
+  consumed_valid_samples .......................... 0
+  context_parallel_size ........................... 1
+  cp_comm_type .................................... ['p2p']
+  create_attention_mask_in_dataloader ............. True
+  cross_entropy_loss_fusion ....................... False
+  cuda_graph_warmup_steps ......................... 2
+  data_args_path .................................. None
+  data_cache_path ................................. None
+  data_parallel_random_init ....................... False
+  data_parallel_size .............................. 4
+  data_path ....................................... None
+  data_per_class_fraction ......................... 1.0
+  data_sharding ................................... True
+  dataloader_type ................................. single
+  ddp_average_in_collective ....................... False
+  ddp_bucket_size ................................. None
+  decoder_first_pipeline_num_layers ............... None
+  decoder_last_pipeline_num_layers ................ None
+  decoder_num_layers .............................. None
+  decoder_seq_length .............................. None
+  decoupled_lr .................................... None
+  decoupled_min_lr ................................ None
+  decrease_batch_size_if_needed ................... False
+  defer_embedding_wgrad_compute ................... False
+  deprecated_use_mcore_models ..................... False
+  deterministic_mode .............................. False
+  dino_bottleneck_size ............................ 256
+  dino_freeze_last_layer .......................... 1
+  dino_head_hidden_size ........................... 2048
+  dino_local_crops_number ......................... 10
+  dino_local_img_size ............................. 96
+  dino_norm_last_layer ............................ False
+  dino_teacher_temp ............................... 0.07
+  dino_warmup_teacher_temp ........................ 0.04
+  dino_warmup_teacher_temp_epochs ................. 30
+  disable_straggler_on_startup .................... False
+  dist_ckpt_format_deprecated ..................... None
+  dist_ckpt_strictness ............................ assume_ok_unexpected
+  distribute_saved_activations .................... False
+  distributed_backend ............................. nccl
+  distributed_timeout_minutes ..................... 10
+  embedding_path .................................. None
+  empty_unused_memory_level ....................... 0
+  enable_cuda_graph ............................... False
+  enable_ft_package ............................... False
+  enable_one_logger ............................... True
+  encoder_num_layers .............................. 28
+  encoder_pipeline_model_parallel_size ............ 0
+  encoder_seq_length .............................. 2048
+  encoder_tensor_model_parallel_size .............. 0
+  end_weight_decay ................................ 0.1
+  eod_mask_loss ................................... False
+  error_injection_rate ............................ 0
+  error_injection_type ............................ transient_error
+  eval_interval ................................... 1000
+  eval_iters ...................................... 0
+  evidence_data_path .............................. None
+  exit_duration_in_mins ........................... None
+  exit_interval ................................... None
+  exit_on_missing_checkpoint ...................... False
+  exit_signal_handler ............................. False
+  exit_trigger .................................... /dev/null/exit
+  exp_avg_dtype ................................... torch.float32
+  exp_avg_sq_dtype ................................ torch.float32
+  expert_model_parallel_size ...................... 1
+  expert_tensor_parallel_size ..................... 1
+  ffn_hidden_size ................................. 8192
+  final_layernorm ................................. True
+  finetune ........................................ False
+  fix_old_xielu ................................... False
+  flash_decode .................................... False
+  fp16 ............................................ False
+  fp16_lm_cross_entropy ........................... False
+  fp32_residual_connection ........................ False
+  fp8 ............................................. None
+  fp8_amax_compute_algo ........................... most_recent
+  fp8_amax_history_len ............................ 1
+  fp8_interval .................................... 1
+  fp8_margin ...................................... 0
+  fp8_param_gather ................................ False
+  fp8_wgrad ....................................... True
+  global_batch_size ............................... 32
+  goldfish_h ...................................... 50
+  goldfish_k ...................................... 50
+  goldfish_loss ................................... False
+  gradient_accumulation_fusion .................... True
+  group_query_attention ........................... False
+  head_lr_mult .................................... 1.0
+  hidden_dropout .................................. 0.1
+  hidden_size ..................................... 3072
+  hierarchical_context_parallel_sizes ............. None
+  hybrid_attention_ratio .......................... 0.0
+  hybrid_mlp_ratio ................................ 0.0
+  hybrid_override_pattern ......................... None
+  hysteresis ...................................... 2
+  ict_head_size ................................... None
+  ict_load ........................................ None
+  img_h ........................................... 224
+  img_w ........................................... 224
+  indexer_batch_size .............................. 128
+  indexer_log_interval ............................ 1000
+  inference_batch_times_seqlen_threshold .......... -1
+  inference_max_seq_length ........................ 2560
+  inference_rng_tracker ........................... False
+  init_method_std ................................. 0.02
+  init_method_xavier_uniform ...................... False
+  initial_loss_scale .............................. 4294967296
+  input_embeddings_multiplier ..................... 1.0
+  iter_per_epoch .................................. 1250
+  kv_channels ..................................... 128
+  kv_lora_rank .................................... 32
+  layernorm_init .................................. None
+  lazy_mpu_init ................................... None
+  load ............................................ None
+  local_rank ...................................... 0
+  log_interval .................................... 1
+  log_loss_scale_to_tensorboard ................... True
+  log_memory_to_tensorboard ....................... False
+  log_num_zeros_in_grad ........................... False
+  log_params_norm ................................. False
+  log_params_norm_per_param ....................... False
+  log_progress .................................... False
+  log_straggler ................................... False
+  log_throughput .................................. True
+  log_timers_to_tensorboard ....................... False
+  log_validation_ppl_to_tensorboard ............... False
+  log_world_size_to_tensorboard ................... False
+  logging_level ................................... None
+  loss_scale ...................................... None
+  loss_scale_window ............................... 1000
+  lr .............................................. 0.00015
+  lr_decay_iters .................................. None
+  lr_decay_samples ................................ None
+  lr_decay_style .................................. cosine
+  lr_warmup_fraction .............................. None
+  lr_warmup_init .................................. 0.0
+  lr_warmup_iters ................................. 5
+  lr_warmup_samples ............................... 0
+  lr_wsd_decay_iters .............................. None
+  lr_wsd_decay_samples ............................ None
+  lr_wsd_decay_style .............................. 1-sqrt
+  main_grads_dtype ................................ torch.float32
+  main_params_dtype ............................... torch.float32
+  make_vocab_size_divisible_by .................... 128
+  manual_gc ....................................... False
+  manual_gc_eval .................................. True
+  manual_gc_interval .............................. 0
+  mask_factor ..................................... 1.0
+  mask_prob ....................................... 0.15
+  mask_type ....................................... random
+  masked_softmax_fusion ........................... True
+  max_position_embeddings ......................... 2048
+  max_tokens_to_oom ............................... 12000
+  memory_snapshot_path ............................ snapshot.pickle
+  merge_file ...................................... None
+  micro_batch_size ................................ 1
+  microbatch_group_size_per_vp_stage .............. None
+  min_loss_scale .................................. 1.0
+  min_lr .......................................... 1.5e-05
+  mlp_layernorm ................................... True
+  mmap_bin_files .................................. True
+  mock_data ....................................... True
+  moe_aux_loss_coeff .............................. 0.0
+  moe_expert_capacity_factor ...................... None
+  moe_extended_tp ................................. False
+  moe_ffn_hidden_size ............................. 8192
+  moe_grouped_gemm ................................ False
+  moe_input_jitter_eps ............................ None
+  moe_layer_freq .................................. 1
+  moe_layer_recompute ............................. False
+  moe_pad_expert_input_to_capacity ................ False
+  moe_per_layer_logging ........................... False
+  moe_router_bias_update_rate ..................... 0.001
+  moe_router_enable_expert_bias ................... False
+  moe_router_load_balancing_type .................. aux_loss
+  moe_router_pre_softmax .......................... False
+  moe_router_score_function ....................... softmax
+  moe_router_topk ................................. 2
+  moe_router_topk_limited_devices ................. None
+  moe_router_topk_scaling_factor .................. None
+  moe_shared_expert_intermediate_size ............. None
+  moe_shared_expert_overlap ....................... False
+  moe_token_dispatcher_type ....................... allgather
+  moe_token_drop_policy ........................... probs
+  moe_use_legacy_grouped_gemm ..................... False
+  moe_use_upcycling ............................... False
+  moe_z_loss_coeff ................................ None
+  multi_latent_attention .......................... False
+  nccl_communicator_config_path ................... None
+  no_load_optim ................................... None
+  no_load_rng ..................................... None
+  no_persist_layer_norm ........................... False
+  no_save_optim ................................... None
+  no_save_rng ..................................... None
+  non_persistent_ckpt_type ........................ None
+  non_persistent_global_ckpt_dir .................. None
+  non_persistent_local_ckpt_algo .................. fully_parallel
+  non_persistent_local_ckpt_dir ................... None
+  non_persistent_save_interval .................... None
+  norm_epsilon .................................... 1e-05
+  normalization ................................... LayerNorm
+  num_attention_heads ............................. 24
+  num_channels .................................... 3
+  num_classes ..................................... 1000
+  num_dataset_builder_threads ..................... 1
+  num_distributed_optimizer_instances ............. 1
+  num_experts ..................................... None
+  num_layers ...................................... 28
+  num_layers_per_virtual_pipeline_stage ........... None
+  num_query_groups ................................ 1
+  num_virtual_stages_per_pipeline_rank ............ None
+  num_workers ..................................... 2
+  one_logger_async ................................ False
+  one_logger_project .............................. megatron-lm
+  one_logger_run_name ............................. None
+  onnx_safe ....................................... None
+  openai_gelu ..................................... False
+  optimizer ....................................... adam
+  output_bert_embeddings .......................... False
+  overlap_grad_reduce ............................. False
+  overlap_p2p_comm ................................ False
+  overlap_p2p_comm_warmup_flush ................... False
+  overlap_param_gather ............................ False
+  overlap_param_gather_with_optimizer_step ........ False
+  override_opt_param_scheduler .................... False
+  params_dtype .................................... torch.bfloat16
+  patch_dim ....................................... 16
+  per_split_data_args_path ........................ None
+  perform_initialization .......................... True
+  pipeline_model_parallel_size .................... 1
+  pipeline_model_parallel_split_rank .............. None
+  position_embedding_type ......................... learned_absolute
+  post_layer_norm ................................. False
+  pretrained_checkpoint ........................... None
+  profile ......................................... False
+  profile_ranks ................................... [0]
+  profile_step_end ................................ 12
+  profile_step_start .............................. 10
+  q_lora_rank ..................................... None
+  qk_head_dim ..................................... 128
+  qk_layernorm .................................... False
+  qk_pos_emb_head_dim ............................. 64
+  qknorm_impl ..................................... te
+  query_in_block_prob ............................. 0.1
+  rampup_batch_size ............................... None
+  rank ............................................ 0
+  recompute_granularity ........................... None
+  recompute_method ................................ None
+  recompute_num_layers ............................ None
+  record_memory_history ........................... False
+  relative_attention_max_distance ................. 128
+  relative_attention_num_buckets .................. 32
+  replication ..................................... False
+  replication_factor .............................. 2
+  replication_jump ................................ None
+  rerun_mode ...................................... disabled
+  reset_attention_mask ............................ False
+  reset_position_ids .............................. False
+  retriever_report_topk_accuracies ................ []
+  retriever_score_scaling ......................... False
+  retriever_seq_length ............................ 256
+  retro_add_retriever ............................. False
+  retro_attention_gate ............................ 1
+  retro_cyclic_train_iters ........................ None
+  retro_encoder_attention_dropout ................. 0.1
+  retro_encoder_hidden_dropout .................... 0.1
+  retro_encoder_layers ............................ 2
+  retro_num_neighbors ............................. 2
+  retro_num_retrieved_chunks ...................... 2
+  retro_project_dir ............................... None
+  retro_verify_neighbor_count ..................... True
+  rope_scaling_factor ............................. 8.0
+  rotary_base ..................................... 10000
+  rotary_interleaved .............................. False
+  rotary_percent .................................. 1.0
+  rotary_scaling_factor ........................... 1.0
+  rotary_seq_len_interpolation_factor ............. None
+  s3_cache_path ................................... None
+  sample_rate ..................................... 1.0
+  save ............................................ None
+  save_interval ................................... None
+  save_trigger .................................... /dev/null/save
+  scatter_gather_tensors_in_pipeline .............. True
+  seed ............................................ 1234
+  seq_length ...................................... 2048
+  sequence_parallel ............................... False
+  sgd_momentum .................................... 0.9
+  short_seq_prob .................................. 0.1
+  skip_train ...................................... False
+  skipped_train_samples ........................... 0
+  spec ............................................ ['megatron.core.models.gpt.gpt_layer_specs', 'get_gpt_layer_semigroup_spec']
+  split ........................................... 100,0,0
+  squared_relu .................................... False
+  start_weight_decay .............................. 0.1
+  straggler_ctrlr_port ............................ 65535
+  straggler_minmax_count .......................... 1
+  swiglu .......................................... False
+  swin_backbone_type .............................. tiny
+  te_rng_tracker .................................. False
+  tensor_model_parallel_size ...................... 1
+  tensorboard_dir ................................. /iopsstor/scratch/cscs/ooikonomou/Megatron-LM-new-attention/logs/test-3b-semigroup-mock-1238364/tensorboard
+  tensorboard_log_interval ........................ 1
+  tensorboard_queue_size .......................... 1000
+  test_data_path .................................. None
+  test_mode ....................................... False
+  tiktoken_num_special_tokens ..................... 1000
+  tiktoken_pattern ................................ None
+  tiktoken_special_tokens ......................... None
+  timing_log_level ................................ 0
+  timing_log_option ............................... minmax
+  titles_data_path ................................ None
+  tokenizer_model ................................. None
+  tokenizer_type .................................. NullTokenizer
+  tp_comm_bootstrap_backend ....................... nccl
+  tp_comm_bulk_dgrad .............................. True
+  tp_comm_bulk_wgrad .............................. True
+  tp_comm_overlap ................................. False
+  tp_comm_overlap_ag .............................. True
+  tp_comm_overlap_cfg ............................. None
+  tp_comm_overlap_rs .............................. True
+  tp_comm_overlap_rs_dgrad ........................ False
+  tp_comm_split_ag ................................ True
+  tp_comm_split_rs ................................ True
+  train_data_path ................................. None
+  train_iters ..................................... 20
+  train_samples ................................... None
+  train_sync_interval ............................. None
+  transformer_impl ................................ local
+  transformer_pipeline_model_parallel_size ........ 1
+  trigger_path .................................... /dev/null
+  untie_embeddings_and_output_weights ............. False
+  use_checkpoint_args ............................. False
+  use_checkpoint_opt_param_scheduler .............. False
+  use_cpu_initialization .......................... None
+  use_dist_ckpt ................................... True
+  use_dist_ckpt_deprecated ........................ False
+  use_distributed_optimizer ....................... False
+  use_flash_attn .................................. False
+  use_legacy_models ............................... False
+  use_mp_args_from_checkpoint_args ................ False
+  use_one_sent_docs ............................... False
+  use_precision_aware_optimizer ................... False
+  use_pytorch_profiler ............................ False
+  use_ring_exchange_p2p ........................... False
+  use_rope_scaling ................................ False
+  use_rotary_position_embeddings .................. False
+  use_tokenizer_model_from_checkpoint_args ........ True
+  use_torch_fsdp2 ................................. False
+  use_tp_pp_dp_mapping ............................ False
+  v_head_dim ...................................... 128
+  valid_data_path ................................. None
+  variable_seq_lengths ............................ False
+  virtual_pipeline_model_parallel_size ............ None
+  vision_backbone_type ............................ vit
+  vision_pretraining .............................. False
+  vision_pretraining_type ......................... classify
+  vocab_extra_ids ................................. 0
+  vocab_file ...................................... None
+  vocab_size ...................................... 65536
+  wandb_exp_name .................................. 
+  wandb_project ................................... 
+  wandb_save_dir .................................. 
+  weight_decay .................................... 0.1
+  weight_decay_incr_style ......................... constant
+  wgrad_deferral_limit ............................ 0
+  world_size ...................................... 4
+  xielu ........................................... False
+  xiprelu ......................................... False
+  xiprelup ........................................ False
+  yaml_cfg ........................................ None
+-------------------- end of arguments ---------------------
+INFO:megatron.core.num_microbatches_calculator:setting number of microbatches to constant 8
+> building NullTokenizer tokenizer ...
+ > padded vocab (size: 65537) with 127 dummy tokens (new size: 65664)
+WARNING:megatron.core.rerun_state_machine:RerunStateMachine initialized in mode RerunMode.DISABLED
+> initializing torch distributed ...
+> setting tensorboard ...
+WARNING: one_logger package is required to enable e2e metrics tracking. please go to https://confluence.nvidia.com/display/MLWFO/Package+Repositories for details to install it
+[Gloo] Rank [Gloo] Rank [Gloo] Rank [Gloo] Rank 2103 is connected to  is connected to  is connected to  is connected to 3333 peer ranks.  peer ranks.  peer ranks.  peer ranks. Expected number of connected peer ranks is : Expected number of connected peer ranks is : Expected number of connected peer ranks is : Expected number of connected peer ranks is : 3333
+
+
+
+[Gloo] Rank 0 is connected to 3 peer ranks. Expected number of connected peer ranks is : 3
+[Gloo] Rank [Gloo] Rank [Gloo] Rank 213 is connected to  is connected to  is connected to 333 peer ranks.  peer ranks.  peer ranks. Expected number of connected peer ranks is : Expected number of connected peer ranks is : Expected number of connected peer ranks is : 333
+
+
+[Gloo] Rank [Gloo] Rank 1[Gloo] Rank [Gloo] Rank 0 is connected to 32 is connected to 3 is connected to  is connected to 3 peer ranks. 33 peer ranks. Expected number of connected peer ranks is :  peer ranks.  peer ranks. Expected number of connected peer ranks is : 3Expected number of connected peer ranks is : Expected number of connected peer ranks is : 3
+33
+
+
+> initialized tensor model parallel with size 1
+> initialized pipeline model parallel with size 1
+> setting random seeds to 1234 ...
+> compiling dataset index builder ...
+make: Entering directory '/iopsstor/scratch/cscs/ooikonomou/Megatron-LM-new-attention/megatron/core/datasets'
+make: Nothing to be done for 'default'.
+make: Leaving directory '/iopsstor/scratch/cscs/ooikonomou/Megatron-LM-new-attention/megatron/core/datasets'
+>>> done with dataset index builder. Compilation time: 0.070 seconds
+> compiling and loading fused kernels ...
+NCCL version 2.28.8+cuda13.0
+>>> done with compiling and loading fused kernels. Compilation time: 7.945 seconds
+time to initialize megatron (seconds): 11.156
+[after megatron is initialized] datetime: 2025-12-15 13:12:49 
+building GPT model ...
+[SemigroupSelfAttentionMegatron] Initialized on layer 1 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 1 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 1 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 1 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 2 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 2 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 2 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 2 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 3 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 3 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 3 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 3 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 4 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 4 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 4 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 4 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 5 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 5 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 5 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 5 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 6 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 6 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 6 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 6 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 7 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 7 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 7 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 7 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 8 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 8 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 8 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 8 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 9 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 9 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 9 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 9 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 10 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 10 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 10 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 10 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 11 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 11 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 11 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 11 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 12 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 12 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 12 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 12 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 13 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 13 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 13 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 13 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 14 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 14 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 14 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 14 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 15 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 15 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 15 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 15 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 16 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 16 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 16 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 16 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 17 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 17 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 17 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 17 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 18 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 18 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 18 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 18 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 19 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 19 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 19 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 19 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 20 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 20 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 20 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 20 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 21 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 21 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 21 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 21 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 22 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 22 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 22 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 22 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 23 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 23 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 23 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 23 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 24 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 24 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 24 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 24 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 25 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 25 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 25 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 25 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 26 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 26 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 26 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 26 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 27 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 27 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 27 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 27 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 28 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 28 with hidden_size=3072, num_heads=24, max_seq=2048
+Built model:
+GPTModel(
+  (embedding): LanguageModelEmbedding(
+    (word_embeddings): VocabParallelEmbedding()
+    (position_embeddings): Embedding(2048, 3072)
+    (embedding_dropout): Dropout(p=0.1, inplace=False)
+  )
+  (decoder): TransformerBlock(
+    (layers): ModuleList(
+      (0-27): 28 x TransformerLayer(
+        (input_layernorm): FusedLayerNorm()
+        (self_attention): SemigroupSelfAttentionMegatron(
+          (semigroup_attn): CausalSemigroupSelfAttentionSelective(
+            (qkvg): Linear(in_features=3072, out_features=12288, bias=False)
+            (out_proj): Linear(in_features=3072, out_features=3072, bias=False)
+            (dropout): Dropout(p=0.1, inplace=False)
+          )
+        )
+        (pre_cross_attn_layernorm): IdentityOp()
+        (cross_attention): IdentityOp()
+        (cross_attn_bda): IdentityFuncOp()
+        (pre_mlp_layernorm): FusedLayerNorm()
+        (mlp): MLP(
+          (linear_fc1): ColumnParallelLinear(in_features=3072, out_features=8192, bias=False, TP=1)
+          (linear_fc2): RowParallelLinear(in_features=8192, out_features=3072, bias=False, TP=1)
+        )
+      )
+    )
+    (final_layernorm): LayerNorm()
+  )
+  (output_layer): ColumnParallelLinear(in_features=3072, out_features=65664, bias=False, TP=1)
+)
+Config:
+TransformerConfig(tensor_model_parallel_size=1, pipeline_model_parallel_size=1, virtual_pipeline_model_parallel_size=None, sequence_parallel=False, context_parallel_size=1, hierarchical_context_parallel_sizes=None, expert_model_parallel_size=1, expert_tensor_parallel_size=1, moe_extended_tp=False, perform_initialization=True, use_cpu_initialization=None, fp16=False, bf16=True, params_dtype=torch.bfloat16, timers=None, finalize_model_grads_func=None, grad_scale_func=None, no_sync_func=None, grad_sync_func=None, param_sync_func=None, deterministic_mode=False, enable_autocast=False, autocast_dtype=torch.bfloat16, num_microbatches_with_partial_activation_checkpoints=None, gradient_accumulation_fusion=True, async_tensor_model_parallel_allreduce=True, use_te_rng_tracker=False, tp_comm_overlap=False, tp_comm_bulk_wgrad=True, tp_comm_bulk_dgrad=True, tp_comm_overlap_ag=True, tp_comm_overlap_rs=True, tp_comm_overlap_rs_dgrad=False, tp_comm_split_ag=True, tp_comm_atomic_ag=False, tp_comm_split_rs=True, tp_comm_atomic_rs=False, cross_entropy_loss_fusion=False, tp_comm_overlap_disable_qkv=False, tp_comm_overlap_disable_fc1=False, tp_comm_bootstrap_backend='nccl', pipeline_dtype=torch.bfloat16, variable_seq_lengths=False, overlap_p2p_comm=False, batch_p2p_comm=True, batch_p2p_sync=True, use_ring_exchange_p2p=False, deallocate_pipeline_outputs=True, defer_embedding_wgrad_compute=False, wgrad_deferral_limit=0, pipeline_model_parallel_split_rank=None, overlap_p2p_comm_warmup_flush=False, microbatch_group_size_per_vp_stage=1, cpu_offloading=False, cpu_offloading_num_layers=0, _cpu_offloading_context=None, cpu_offloading_activations=True, cpu_offloading_weights=True, barrier_with_L1_time=True, num_layers=28, num_layers_in_first_pipeline_stage=None, num_layers_in_last_pipeline_stage=None, account_for_embedding_in_pipeline_split=False, account_for_loss_in_pipeline_split=False, hidden_size=3072, num_attention_heads=24, attention_backend=<AttnBackend.auto: 5>, softmax_scale=None, num_query_groups=24, ffn_hidden_size=8192, kv_channels=128, hidden_dropout=0.1, attention_dropout=0.1, fp32_residual_connection=False, apply_residual_connection_post_layernorm=False, layernorm_epsilon=1e-05, layernorm_zero_centered_gamma=False, add_bias_linear=True, add_qkv_bias=True, gated_linear_unit=False, activation_func=<built-in function gelu>, activation_func_fp8_input_store=False, num_moe_experts=None, rotary_interleaved=False, window_size=None, normalization='LayerNorm', qk_layernorm=False, test_mode=False, calculate_per_token_loss=False, multi_latent_attention=False, post_layer_norm=False, layernorm_init=None, init_method=<function init_method_normal.<locals>.init_ at 0x4003d68a3ce0>, output_layer_init_method=<function scaled_init_method_normal.<locals>.init_ at 0x400524163060>, init_method_std=0.02, apply_query_key_layer_scaling=False, attention_softmax_in_fp32=False, bias_activation_fusion=True, masked_softmax_fusion=True, persist_layer_norm=True, memory_efficient_layer_norm=False, bias_dropout_fusion=True, apply_rope_fusion=False, recompute_granularity=None, recompute_method=None, recompute_num_layers=None, distribute_saved_activations=False, fp8=None, fp8_margin=0, fp8_interval=1, fp8_amax_history_len=1, fp8_amax_compute_algo='most_recent', fp8_wgrad=True, fp8_dot_product_attention=False, fp8_multi_head_attention=False, tp_only_amax_red=False, moe_shared_expert_intermediate_size=None, moe_shared_expert_overlap=False, moe_layer_freq=1, moe_ffn_hidden_size=8192, moe_router_load_balancing_type='aux_loss', moe_router_topk=2, moe_router_topk_limited_devices=None, moe_router_pre_softmax=False, moe_router_topk_scaling_factor=None, moe_router_score_function='softmax', moe_router_enable_expert_bias=False, moe_router_bias_update_rate=0.001, moe_grouped_gemm=False, moe_use_legacy_grouped_gemm=False, moe_aux_loss_coeff=0.0, moe_z_loss_coeff=None, moe_input_jitter_eps=None, moe_token_dropping=False, moe_token_dispatcher_type='allgather', moe_per_layer_logging=False, moe_expert_capacity_factor=None, moe_pad_expert_input_to_capacity=False, moe_token_drop_policy='probs', moe_layer_recompute=False, cp_comm_type='p2p', enable_cuda_graph=False, cuda_graph_use_single_mempool=False, cuda_graph_retain_backward_graph=False, cuda_graph_warmup_steps=2, external_cuda_graph=False, clone_scatter_output_in_embedding=True, disable_parameter_transpose_cache=False, config_logger_dir='', flash_decode=False, inference_rng_tracker=False)
+ > number of parameters on (tensor, pipeline) model parallel rank (0, 0): 2939175516
+[SemigroupSelfAttentionMegatron] Initialized on layer 28 with hidden_size=3072, num_heads=24, max_seq=2048
+[SemigroupSelfAttentionMegatron] Initialized on layer 28 with hidden_size=3072, num_heads=24, max_seq=2048
+INFO:megatron.core.distributed.distributed_data_parallel:Setting up DistributedDataParallel with config DistributedDataParallelConfig(grad_reduce_in_fp32=True, overlap_grad_reduce=False, overlap_param_gather=False, align_param_gather=False, use_distributed_optimizer=False, num_distributed_optimizer_instances=1, check_for_nan_in_grad=True, bucket_size=None, average_in_collective=False, fp8_param_gather=False)
+INFO:megatron.core.distributed.param_and_grad_buffer:Number of buckets for gradient all-reduce / reduce-scatter: 1
+Params for bucket 1 (2939175516 elements):
+	module.decoder.layers.2.pre_mlp_layernorm.weight
+	module.decoder.layers.26.pre_mlp_layernorm.weight
+	module.decoder.layers.20.self_attention.semigroup_attn.log_tau
+	module.decoder.layers.22.pre_mlp_layernorm.bias
+	module.decoder.layers.18.pre_mlp_layernorm.weight
+	module.decoder.layers.16.self_attention.semigroup_attn.log_tau
+	module.decoder.layers.12.self_attention.semigroup_attn.log_tau
+	module.decoder.layers.14.pre_mlp_layernorm.bias
+	module.decoder.layers.8.self_attention.semigroup_attn.log_tau
+	module.decoder.layers.6.pre_mlp_layernorm.bias
+	module.decoder.layers.4.self_attention.semigroup_attn.lam
+	module.decoder.layers.24.self_attention.semigroup_attn.log_tau
+	module.decoder.layers.17.mlp.linear_fc2.weight
+	module.decoder.layers.2.pre_mlp_layernorm.bias
+	module.decoder.layers.26.pre_mlp_layernorm.bias
+	module.decoder.layers.20.self_attention.semigroup_attn.lam
+	module.decoder.layers.18.pre_mlp_layernorm.bias
+	module.decoder.layers.16.self_attention.semigroup_attn.lam
+	module.decoder.layers.12.self_attention.semigroup_attn.lam
+	module.decoder.layers.8.self_attention.semigroup_attn.lam
+	module.decoder.layers.10.mlp.linear_fc1.bias
+	module.decoder.layers.4.self_attention.semigroup_attn.beta
+	module.decoder.layers.24.self_attention.semigroup_attn.lam
+	module.decoder.layers.20.self_attention.semigroup_attn.beta
+	module.decoder.layers.12.self_attention.semigroup_attn.beta
+	module.decoder.layers.22.mlp.linear_fc1.bias
+	module.decoder.layers.16.self_attention.semigroup_attn.beta
+	module.decoder.layers.10.mlp.linear_fc2.weight
+	module.decoder.layers.1.self_attention.semigroup_attn.out_proj.weight
+	module.decoder.layers.21.self_attention.semigroup_attn.qkvg.weight
+	module.decoder.layers.14.mlp.linear_fc1.bias
+	module.decoder.layers.8.self_attention.semigroup_attn.beta
+	module.decoder.layers.17.self_attention.semigroup_attn.qkvg.weight
+	module.decoder.layers.13.self_attention.semigroup_attn.qkvg.weight
+	module.decoder.layers.10.mlp.linear_fc1.weight
+	module.decoder.layers.6.mlp.linear_fc1.bias
+	module.decoder.layers.4.self_attention.semigroup_attn.logit_w
+	module.decoder.layers.24.self_attention.semigroup_attn.beta
+	module.decoder.layers.22.mlp.linear_fc2.weight
+	module.decoder.layers.9.self_attention.semigroup_attn.qkvg.weight
+	module.decoder.layers.5.self_attention.semigroup_attn.qkvg.weight
+	module.decoder.layers.2.mlp.linear_fc1.bias
+	module.decoder.layers.26.mlp.linear_fc1.bias
+	module.decoder.layers.20.self_attention.semigroup_attn.logit_w
+	module.decoder.layers.14.mlp.linear_fc2.weight
+	module.decoder.layers.10.input_layernorm.weight
+	module.decoder.layers.25.self_attention.semigroup_attn.qkvg.weight
+	module.decoder.layers.22.mlp.linear_fc1.weight
+	module.decoder.layers.16.self_attention.semigroup_attn.logit_w
+	module.decoder.layers.12.self_attention.semigroup_attn.logit_w
+	module.decoder.layers.6.mlp.linear_fc2.weight
+	module.decoder.layers.1.self_attention.semigroup_attn.log_tau
+	module.decoder.layers.0.self_attention.semigroup_attn.beta
+	module.decoder.layers.8.self_attention.semigroup_attn.logit_w
+	module.decoder.layers.14.mlp.linear_fc1.weight
+	module.decoder.layers.2.mlp.linear_fc2.weight
+	module.decoder.layers.26.mlp.linear_fc2.weight
+	module.decoder.layers.6.mlp.linear_fc1.weight
+	module.decoder.layers.18.mlp.linear_fc2.weight
+	module.decoder.layers.24.self_attention.semigroup_attn.logit_w
+	module.decoder.layers.22.input_layernorm.weight
+	module.decoder.layers.2.mlp.linear_fc1.weight
+	module.decoder.layers.26.mlp.linear_fc1.weight
+	module.decoder.layers.14.input_layernorm.weight
+	module.decoder.layers.18.mlp.linear_fc1.weight
+	module.decoder.layers.10.input_layernorm.bias
+	module.decoder.layers.6.input_layernorm.weight
+	module.decoder.layers.21.self_attention.semigroup_attn.out_proj.weight
+	module.decoder.layers.2.input_layernorm.weight
+	module.decoder.layers.10.mlp.linear_fc2.bias
+	module.decoder.final_layernorm.bias
+	module.decoder.layers.26.input_layernorm.weight
+	module.decoder.layers.17.self_attention.semigroup_attn.out_proj.weight
+	module.decoder.layers.13.self_attention.semigroup_attn.out_proj.weight
+	module.decoder.layers.4.self_attention.semigroup_attn.out_scale
+	module.decoder.layers.22.input_layernorm.bias
+	module.decoder.layers.18.input_layernorm.weight
+	module.decoder.layers.9.self_attention.semigroup_attn.out_proj.weight
+	module.decoder.layers.5.self_attention.semigroup_attn.out_proj.weight
+	module.decoder.layers.20.self_attention.semigroup_attn.out_scale
+	module.decoder.layers.14.input_layernorm.bias
+	module.decoder.layers.12.self_attention.semigroup_attn.out_scale
+	module.decoder.layers.25.self_attention.semigroup_attn.out_proj.weight
+	module.decoder.layers.22.mlp.linear_fc2.bias
+	module.decoder.layers.18.mlp.linear_fc2.bias
+	module.decoder.layers.16.self_attention.semigroup_attn.out_scale
+	module.decoder.layers.6.input_layernorm.bias
+	module.decoder.layers.3.pre_mlp_layernorm.weight
+	module.decoder.layers.14.mlp.linear_fc2.bias
+	module.decoder.layers.8.self_attention.semigroup_attn.out_scale
+	module.decoder.layers.2.input_layernorm.bias
+	module.decoder.layers.26.input_layernorm.bias
+	module.decoder.layers.23.pre_mlp_layernorm.weight
+	module.decoder.layers.19.pre_mlp_layernorm.weight
+	module.decoder.layers.6.mlp.linear_fc2.bias
+	module.decoder.layers.11.pre_mlp_layernorm.weight
+	module.decoder.layers.24.self_attention.semigroup_attn.out_scale
+	module.decoder.layers.18.input_layernorm.bias
+	module.decoder.layers.15.pre_mlp_layernorm.weight
+	module.decoder.layers.2.mlp.linear_fc2.bias
+	module.decoder.layers.26.mlp.linear_fc2.bias
+	module.decoder.layers.7.pre_mlp_layernorm.weight
+	module.decoder.layers.3.pre_mlp_layernorm.bias
+	module.decoder.layers.0.self_attention.semigroup_attn.logit_w
+	module.decoder.layers.27.pre_mlp_layernorm.weight
+	module.decoder.layers.21.self_attention.semigroup_attn.log_tau
+	module.decoder.final_layernorm.weight
+	module.decoder.layers.23.pre_mlp_layernorm.bias
+	module.decoder.layers.19.pre_mlp_layernorm.bias
+	module.decoder.layers.17.self_attention.semigroup_attn.log_tau
+	module.decoder.layers.13.self_attention.semigroup_attn.log_tau
+	module.decoder.layers.15.pre_mlp_layernorm.bias
+	module.decoder.layers.11.pre_mlp_layernorm.bias
+	module.decoder.layers.9.self_attention.semigroup_attn.log_tau
+	module.decoder.layers.5.self_attention.semigroup_attn.log_tau
+	module.decoder.layers.7.pre_mlp_layernorm.bias
+	module.decoder.layers.25.self_attention.semigroup_attn.log_tau
+	module.embedding.word_embeddings.weight
+	module.decoder.layers.27.pre_mlp_layernorm.bias
+	module.decoder.layers.21.self_attention.semigroup_attn.lam
+	module.decoder.layers.17.self_attention.semigroup_attn.lam
+	module.decoder.layers.13.self_attention.semigroup_attn.lam
+	module.decoder.layers.0.mlp.linear_fc1.bias
+	module.decoder.layers.0.pre_mlp_layernorm.bias
+	module.decoder.layers.9.self_attention.semigroup_attn.lam
+	module.decoder.layers.5.self_attention.semigroup_attn.lam
+	module.decoder.layers.25.self_attention.semigroup_attn.lam
+	module.decoder.layers.10.self_attention.semigroup_attn.qkvg.weight
+	module.decoder.layers.3.mlp.linear_fc1.bias
+	module.decoder.layers.0.mlp.linear_fc2.bias
+	module.decoder.layers.21.self_attention.semigroup_attn.beta
+	module.decoder.layers.13.self_attention.semigroup_attn.beta
+	module.decoder.layers.23.mlp.linear_fc1.bias
+	module.decoder.layers.19.mlp.linear_fc1.bias
+	module.decoder.layers.17.self_attention.semigroup_attn.beta
+	module.decoder.layers.11.mlp.linear_fc2.bias
+	module.decoder.layers.22.self_attention.semigroup_attn.qkvg.weight
+	module.decoder.layers.15.mlp.linear_fc1.bias
+	module.decoder.layers.9.self_attention.semigroup_attn.beta
+	module.decoder.layers.5.self_attention.semigroup_attn.beta
+	module.decoder.layers.14.self_attention.semigroup_attn.qkvg.weight
+	module.decoder.layers.7.mlp.linear_fc1.bias
+	module.decoder.layers.25.self_attention.semigroup_attn.beta
+	module.decoder.layers.23.mlp.linear_fc2.weight
+	module.decoder.layers.19.mlp.linear_fc2.weight
+	module.decoder.layers.6.self_attention.semigroup_attn.qkvg.weight
+	module.decoder.layers.3.mlp.linear_fc1.weight
+	module.decoder.layers.15.mlp.linear_fc2.weight
+	module.decoder.layers.27.mlp.linear_fc1.bias
+	module.decoder.layers.21.self_attention.semigroup_attn.logit_w
+	module.decoder.layers.2.self_attention.semigroup_attn.qkvg.weight
+	module.decoder.layers.26.self_attention.semigroup_attn.qkvg.weight
+	module.decoder.layers.23.mlp.linear_fc1.weight
+	module.decoder.layers.19.mlp.linear_fc1.weight
+	module.decoder.layers.17.self_attention.semigroup_attn.logit_w
+	module.decoder.layers.11.input_layernorm.weight
+	module.decoder.layers.13.self_attention.semigroup_attn.logit_w
+	module.decoder.layers.7.mlp.linear_fc2.weight
+	module.decoder.layers.18.self_attention.semigroup_attn.qkvg.weight
+	module.decoder.layers.15.mlp.linear_fc1.weight
+	module.decoder.layers.11.mlp.linear_fc1.weight
+	module.decoder.layers.9.self_attention.semigroup_attn.logit_w
+	module.decoder.layers.5.self_attention.semigroup_attn.logit_w
+	module.decoder.layers.3.mlp.linear_fc2.weight
+	module.decoder.layers.27.mlp.linear_fc2.weight
+	module.decoder.layers.7.mlp.linear_fc1.weight
+	module.decoder.layers.0.self_attention.semigroup_attn.out_proj.weight
+	module.decoder.layers.25.self_attention.semigroup_attn.logit_w
+	module.decoder.layers.23.input_layernorm.weight
+	module.decoder.layers.19.input_layernorm.weight
+	module.decoder.layers.10.self_attention.semigroup_attn.out_proj.weight
+	module.decoder.layers.1.self_attention.semigroup_attn.beta
+	module.decoder.layers.27.mlp.linear_fc1.weight
+	module.decoder.layers.15.input_layernorm.weight
+	module.decoder.layers.11.input_layernorm.bias
+	module.decoder.layers.7.input_layernorm.weight
+	module.decoder.layers.0.pre_mlp_layernorm.weight
+	module.decoder.layers.22.self_attention.semigroup_attn.out_proj.weight
+	module.decoder.layers.11.mlp.linear_fc1.bias
+	module.decoder.layers.3.input_layernorm.weight
+	module.decoder.layers.27.input_layernorm.weight
+	module.decoder.layers.14.self_attention.semigroup_attn.out_proj.weight
+	module.decoder.layers.0.self_attention.semigroup_attn.qkvg.weight
+	module.decoder.layers.23.input_layernorm.bias
+	module.decoder.layers.19.input_layernorm.bias
+	module.decoder.layers.6.self_attention.semigroup_attn.out_proj.weight
+	module.decoder.layers.3.mlp.linear_fc2.bias
+	module.decoder.layers.1.self_attention.semigroup_attn.lam
+	module.decoder.layers.21.self_attention.semigroup_attn.out_scale
+	module.decoder.layers.15.input_layernorm.bias
+	module.decoder.layers.2.self_attention.semigroup_attn.out_proj.weight
+	module.decoder.layers.13.self_attention.semigroup_attn.out_scale
+	module.decoder.layers.26.self_attention.semigroup_attn.out_proj.weight
+	module.decoder.layers.23.mlp.linear_fc2.bias
+	module.decoder.layers.19.mlp.linear_fc2.bias
+	module.decoder.layers.17.self_attention.semigroup_attn.out_scale
+	module.decoder.layers.7.input_layernorm.bias
+	module.decoder.layers.4.pre_mlp_layernorm.weight
+	module.decoder.layers.9.self_attention.semigroup_attn.out_scale
+	module.decoder.layers.18.self_attention.semigroup_attn.out_proj.weight
+	module.decoder.layers.15.mlp.linear_fc2.bias
+	module.decoder.layers.11.mlp.linear_fc2.weight
+	module.decoder.layers.5.self_attention.semigroup_attn.out_scale
+	module.decoder.layers.3.input_layernorm.bias
+	module.decoder.layers.27.input_layernorm.bias
+	module.decoder.layers.20.pre_mlp_layernorm.weight
+	module.decoder.layers.7.mlp.linear_fc2.bias
+	module.decoder.layers.10.self_attention.semigroup_attn.log_tau
+	module.decoder.layers.12.pre_mlp_layernorm.weight
+	module.decoder.layers.25.self_attention.semigroup_attn.out_scale
+	module.decoder.layers.16.pre_mlp_layernorm.weight
+	module.decoder.layers.1.self_attention.semigroup_attn.logit_w
+	module.decoder.layers.27.mlp.linear_fc2.bias
+	module.decoder.layers.8.pre_mlp_layernorm.weight
+	module.decoder.layers.4.pre_mlp_layernorm.bias
+	module.decoder.layers.24.pre_mlp_layernorm.weight
+	module.decoder.layers.22.self_attention.semigroup_attn.log_tau
+	module.decoder.layers.18.mlp.linear_fc1.bias
+	module.decoder.layers.20.pre_mlp_layernorm.bias
+	module.decoder.layers.14.self_attention.semigroup_attn.log_tau
+	module.decoder.layers.16.pre_mlp_layernorm.bias
+	module.decoder.layers.12.pre_mlp_layernorm.bias
+	module.decoder.layers.10.self_attention.semigroup_attn.lam
+	module.decoder.layers.6.self_attention.semigroup_attn.log_tau
+	module.decoder.layers.1.self_attention.semigroup_attn.qkvg.weight
+	module.decoder.layers.8.pre_mlp_layernorm.bias
+	module.decoder.layers.2.self_attention.semigroup_attn.log_tau
+	module.decoder.layers.26.self_attention.semigroup_attn.log_tau
+	module.decoder.layers.24.pre_mlp_layernorm.bias
+	module.decoder.layers.22.self_attention.semigroup_attn.lam
+	module.decoder.layers.18.self_attention.semigroup_attn.log_tau
+	module.decoder.layers.14.self_attention.semigroup_attn.lam
+	module.decoder.layers.10.self_attention.semigroup_attn.beta
+	module.decoder.layers.6.self_attention.semigroup_attn.lam
+	module.decoder.layers.1.input_layernorm.bias
+	module.decoder.layers.2.self_attention.semigroup_attn.lam
+	module.decoder.layers.26.self_attention.semigroup_attn.lam
+	module.decoder.layers.11.self_attention.semigroup_attn.qkvg.weight
+	module.decoder.layers.4.mlp.linear_fc1.bias
+	module.decoder.layers.0.input_layernorm.bias
+	module.decoder.layers.22.self_attention.semigroup_attn.beta
+	module.decoder.layers.18.self_attention.semigroup_attn.lam
+	module.decoder.layers.20.mlp.linear_fc1.bias
+	module.decoder.layers.14.self_attention.semigroup_attn.beta
+	module.decoder.layers.12.mlp.linear_fc1.bias
+	module.decoder.layers.23.self_attention.semigroup_attn.qkvg.weight
+	module.decoder.layers.19.self_attention.semigroup_attn.qkvg.weight
+	module.decoder.layers.16.mlp.linear_fc1.bias
+	module.decoder.layers.10.self_attention.semigroup_attn.logit_w
+	module.decoder.layers.6.self_attention.semigroup_attn.beta
+	module.decoder.layers.4.mlp.linear_fc2.weight
+	module.decoder.layers.0.self_attention.semigroup_attn.lam
+	module.decoder.layers.0.input_layernorm.weight
+	module.decoder.layers.15.self_attention.semigroup_attn.qkvg.weight
+	module.decoder.layers.8.mlp.linear_fc1.bias
+	module.decoder.layers.2.self_attention.semigroup_attn.beta
+	module.decoder.layers.26.self_attention.semigroup_attn.beta
+	module.decoder.layers.20.mlp.linear_fc2.weight
+	module.decoder.layers.7.self_attention.semigroup_attn.qkvg.weight
+	module.decoder.layers.4.mlp.linear_fc1.weight
+	module.decoder.layers.16.mlp.linear_fc2.weight
+	module.decoder.layers.24.mlp.linear_fc2.bias
+	module.decoder.layers.22.self_attention.semigroup_attn.logit_w
+	module.decoder.layers.18.self_attention.semigroup_attn.beta
+	module.decoder.layers.12.mlp.linear_fc2.weight
+	module.decoder.layers.3.self_attention.semigroup_attn.qkvg.weight
+	module.decoder.layers.0.mlp.linear_fc2.weight
+	module.decoder.layers.14.self_attention.semigroup_attn.logit_w
+	module.decoder.layers.8.mlp.linear_fc2.weight
+	module.decoder.layers.27.self_attention.semigroup_attn.qkvg.weight
+	module.decoder.layers.20.mlp.linear_fc1.weight
+	module.decoder.layers.16.mlp.linear_fc1.weight
+	module.decoder.layers.12.mlp.linear_fc1.weight
+	module.decoder.layers.6.self_attention.semigroup_attn.logit_w
+	module.decoder.layers.4.input_layernorm.weight
+	module.decoder.layers.8.mlp.linear_fc1.weight
+	module.decoder.layers.2.self_attention.semigroup_attn.logit_w
+	module.decoder.layers.11.self_attention.semigroup_attn.out_proj.weight
+	module.decoder.layers.26.self_attention.semigroup_attn.logit_w
+	module.decoder.layers.24.input_layernorm.weight
+	module.decoder.layers.20.input_layernorm.weight
+	module.decoder.layers.12.input_layernorm.weight
+	module.decoder.layers.24.mlp.linear_fc1.weight
+	module.decoder.layers.18.self_attention.semigroup_attn.logit_w
+	module.decoder.layers.16.input_layernorm.weight
+	module.decoder.layers.8.input_layernorm.weight
+	module.decoder.layers.10.self_attention.semigroup_attn.out_scale
+	module.decoder.layers.23.self_attention.semigroup_attn.out_proj.weight
+	module.decoder.layers.19.self_attention.semigroup_attn.out_proj.weight
+	module.decoder.layers.4.input_layernorm.bias
+	module.decoder.layers.1.input_layernorm.weight
+	module.decoder.layers.15.self_attention.semigroup_attn.out_proj.weight
+	module.decoder.layers.24.input_layernorm.bias
+	module.decoder.layers.20.input_layernorm.bias
+	module.decoder.layers.7.self_attention.semigroup_attn.out_proj.weight
+	module.decoder.layers.4.mlp.linear_fc2.bias
+	module.decoder.layers.12.input_layernorm.bias
+	module.decoder.layers.24.mlp.linear_fc1.bias
+	module.decoder.layers.22.self_attention.semigroup_attn.out_scale
+	module.decoder.layers.16.input_layernorm.bias
+	module.decoder.layers.3.self_attention.semigroup_attn.out_proj.weight
+	module.decoder.layers.1.self_attention.semigroup_attn.out_scale
+	module.decoder.layers.14.self_attention.semigroup_attn.out_scale
+	module.decoder.layers.8.input_layernorm.bias
+	module.decoder.layers.27.self_attention.semigroup_attn.out_proj.weight
+	module.decoder.layers.20.mlp.linear_fc2.bias
+	module.decoder.layers.16.mlp.linear_fc2.bias
+	module.decoder.layers.12.mlp.linear_fc2.bias
+	module.decoder.layers.6.self_attention.semigroup_attn.out_scale
+	module.decoder.layers.1.mlp.linear_fc2.weight
+	module.decoder.layers.21.pre_mlp_layernorm.weight
+	module.decoder.layers.8.mlp.linear_fc2.bias
+	module.decoder.layers.2.self_attention.semigroup_attn.out_scale
+	module.decoder.layers.11.self_attention.semigroup_attn.log_tau
+	module.decoder.layers.26.self_attention.semigroup_attn.out_scale
+	module.decoder.layers.17.pre_mlp_layernorm.weight
+	module.decoder.layers.13.pre_mlp_layernorm.weight
+	module.decoder.layers.24.mlp.linear_fc2.weight
+	module.decoder.layers.18.self_attention.semigroup_attn.out_scale
+	module.decoder.layers.9.pre_mlp_layernorm.weight
+	module.decoder.layers.5.pre_mlp_layernorm.weight
+	module.decoder.layers.23.self_attention.semigroup_attn.log_tau
+	module.decoder.layers.25.pre_mlp_layernorm.weight
+	module.decoder.layers.19.self_attention.semigroup_attn.log_tau
+	module.decoder.layers.21.pre_mlp_layernorm.bias
+	module.decoder.layers.15.self_attention.semigroup_attn.log_tau
+	module.decoder.layers.17.pre_mlp_layernorm.bias
+	module.decoder.layers.13.pre_mlp_layernorm.bias
+	module.decoder.layers.11.self_attention.semigroup_attn.lam
+	module.decoder.layers.7.self_attention.semigroup_attn.log_tau
+	module.decoder.layers.9.pre_mlp_layernorm.bias
+	module.decoder.layers.5.pre_mlp_layernorm.bias
+	module.decoder.layers.3.self_attention.semigroup_attn.log_tau
+	module.decoder.layers.0.self_attention.semigroup_attn.log_tau
+	module.decoder.layers.27.self_attention.semigroup_attn.log_tau
+	module.decoder.layers.1.pre_mlp_layernorm.weight
+	module.decoder.layers.25.pre_mlp_layernorm.bias
+	module.decoder.layers.23.self_attention.semigroup_attn.lam
+	module.decoder.layers.19.self_attention.semigroup_attn.lam
+	module.decoder.layers.15.self_attention.semigroup_attn.lam
+	module.decoder.layers.11.self_attention.semigroup_attn.beta
+	module.decoder.layers.7.self_attention.semigroup_attn.lam
+	module.decoder.layers.9.mlp.linear_fc1.bias
+	module.decoder.layers.3.self_attention.semigroup_attn.lam
+	module.decoder.layers.27.self_attention.semigroup_attn.lam
+	module.decoder.layers.1.pre_mlp_layernorm.bias
+	module.decoder.layers.23.self_attention.semigroup_attn.beta
+	module.decoder.layers.19.self_attention.semigroup_attn.beta
+	module.decoder.layers.4.self_attention.semigroup_attn.qkvg.weight
+	module.decoder.layers.21.mlp.linear_fc1.bias
+	module.decoder.layers.15.self_attention.semigroup_attn.beta
+	module.decoder.layers.11.self_attention.semigroup_attn.logit_w
+	module.decoder.layers.13.mlp.linear_fc1.bias
+	module.decoder.layers.24.self_attention.semigroup_attn.qkvg.weight
+	module.decoder.layers.20.self_attention.semigroup_attn.qkvg.weight
+	module.decoder.layers.17.mlp.linear_fc1.bias
+	module.decoder.layers.7.self_attention.semigroup_attn.beta
+	module.decoder.layers.16.self_attention.semigroup_attn.qkvg.weight
+	module.decoder.layers.12.self_attention.semigroup_attn.qkvg.weight
+	module.decoder.layers.9.mlp.linear_fc1.weight
+	module.decoder.layers.5.mlp.linear_fc2.bias
+	module.decoder.layers.3.self_attention.semigroup_attn.beta
+	module.decoder.layers.27.self_attention.semigroup_attn.beta
+	module.decoder.layers.21.mlp.linear_fc2.weight
+	module.decoder.layers.8.self_attention.semigroup_attn.qkvg.weight
+	module.decoder.layers.1.mlp.linear_fc1.bias
+	module.decoder.layers.25.mlp.linear_fc1.bias
+	module.decoder.layers.23.self_attention.semigroup_attn.logit_w
+	module.decoder.layers.19.self_attention.semigroup_attn.logit_w
+	module.decoder.layers.13.mlp.linear_fc2.weight
+	module.decoder.layers.0.self_attention.semigroup_attn.out_scale
+	module.decoder.layers.15.self_attention.semigroup_attn.logit_w
+	module.decoder.layers.9.mlp.linear_fc2.weight
+	module.decoder.layers.21.mlp.linear_fc1.weight
+	module.embedding.position_embeddings.weight
+	module.decoder.layers.17.mlp.linear_fc1.weight
+	module.decoder.layers.13.mlp.linear_fc1.weight
+	module.decoder.layers.7.self_attention.semigroup_attn.logit_w
+	module.decoder.layers.5.input_layernorm.weight
+	module.decoder.layers.25.mlp.linear_fc2.weight
+	module.decoder.layers.5.mlp.linear_fc1.weight
+	module.decoder.layers.3.self_attention.semigroup_attn.logit_w
+	module.decoder.layers.27.self_attention.semigroup_attn.logit_w
+	module.decoder.layers.21.input_layernorm.weight
+	module.decoder.layers.1.mlp.linear_fc1.weight
+	module.decoder.layers.25.mlp.linear_fc1.weight
+	module.decoder.layers.17.input_layernorm.weight
+	module.decoder.layers.13.input_layernorm.weight
+	module.decoder.layers.4.self_attention.semigroup_attn.out_proj.weight
+	module.decoder.layers.0.mlp.linear_fc1.weight
+	module.decoder.layers.9.input_layernorm.weight
+	module.decoder.layers.24.self_attention.semigroup_attn.out_proj.weight
+	module.decoder.layers.20.self_attention.semigroup_attn.out_proj.weight
+	module.decoder.layers.11.self_attention.semigroup_attn.out_scale
+	module.decoder.layers.5.input_layernorm.bias
+	module.decoder.layers.9.mlp.linear_fc2.bias
+	module.decoder.layers.25.input_layernorm.weight
+	module.decoder.layers.16.self_attention.semigroup_attn.out_proj.weight
+	module.decoder.layers.12.self_attention.semigroup_attn.out_proj.weight
+	module.decoder.layers.5.mlp.linear_fc1.bias
+	module.decoder.layers.21.input_layernorm.bias
+	module.decoder.layers.8.self_attention.semigroup_attn.out_proj.weight
+	module.decoder.layers.13.input_layernorm.bias
+	module.decoder.layers.23.self_attention.semigroup_attn.out_scale
+	module.decoder.layers.19.self_attention.semigroup_attn.out_scale
+	module.decoder.layers.17.input_layernorm.bias
+	module.decoder.layers.10.pre_mlp_layernorm.weight
+	module.decoder.layers.15.self_attention.semigroup_attn.out_scale
+	module.decoder.layers.9.input_layernorm.bias
+	module.decoder.layers.21.mlp.linear_fc2.bias
+	module.decoder.layers.17.mlp.linear_fc2.bias
+	module.decoder.layers.13.mlp.linear_fc2.bias
+	module.decoder.layers.7.self_attention.semigroup_attn.out_scale
+	module.decoder.layers.25.input_layernorm.bias
+	module.decoder.layers.22.pre_mlp_layernorm.weight
+	module.decoder.layers.5.mlp.linear_fc2.weight
+	module.decoder.layers.3.self_attention.semigroup_attn.out_scale
+	module.decoder.layers.27.self_attention.semigroup_attn.out_scale
+	module.decoder.layers.14.pre_mlp_layernorm.weight
+	module.decoder.layers.1.mlp.linear_fc2.bias
+	module.decoder.layers.25.mlp.linear_fc2.bias
+	module.decoder.layers.10.pre_mlp_layernorm.bias
+	module.decoder.layers.6.pre_mlp_layernorm.weight
+	module.decoder.layers.4.self_attention.semigroup_attn.log_tau
+INFO:megatron.core.optimizer:Setting up optimizer with config OptimizerConfig(optimizer='adam', lr=0.00015, min_lr=1.5e-05, decoupled_lr=None, decoupled_min_lr=None, weight_decay=0.1, fp16=False, bf16=True, params_dtype=torch.bfloat16, use_precision_aware_optimizer=False, main_grads_dtype=torch.float32, main_params_dtype=torch.float32, exp_avg_dtype=torch.float32, exp_avg_sq_dtype=torch.float32, loss_scale=None, initial_loss_scale=4294967296, min_loss_scale=1.0, loss_scale_window=1000, hysteresis=2, adam_beta1=0.9, adam_beta2=0.999, adam_eps=1e-08, sgd_momentum=0.9, ademamix_alpha=5, ademamix_beta3=0.999, ademamix_beta3_warmup=-1, ademamix_alpha_warmup=-1, use_distributed_optimizer=False, overlap_param_gather_with_optimizer_step=False, clip_grad=1.0, log_num_zeros_in_grad=False, barrier_with_L1_time=True, timers=<megatron.core.timers.Timers object at 0x4003d60e6540>, config_logger_dir='')
+INFO:megatron.core.optimizer_param_scheduler:> learning rate decay style: cosine
+[after model, optimizer, and learning rate scheduler are built] datetime: 2025-12-15 13:13:03 
+> building train, validation, and test datasets ...
+ > datasets target sizes (minimum size):
+    train:      640
+    validation: 0
+    test:       0
+INFO:megatron.core.datasets.blended_megatron_dataset_config:Let mock = True, as both blend and blend_per_split are None
+INFO:megatron.core.datasets.blended_megatron_dataset_config:Let split = 1,1,1, an arbitrarily even split, as mock is True
+INFO:megatron.core.datasets.blended_megatron_dataset_config:Let split_matrix = [(0, 0.3333333333333333), (0.3333333333333333, 0.6666666666666666), (0.6666666666666666, 1.0)]
+> building train, validation, and test datasets for GPT ...
+INFO:megatron.core.datasets.blended_megatron_dataset_builder:Building MockGPTDataset splits with sizes=(640, 0, 0) and config=GPTDatasetConfig(random_seed=1234, sequence_length=2048, blend=None, blend_per_split=None, split='1,1,1', split_matrix=[(0, 0.3333333333333333), (0.3333333333333333, 0.6666666666666666), (0.6666666666666666, 1.0)], num_dataset_builder_threads=1, path_to_cache=None, mmap_bin_files=True, mock=True, tokenizer=<megatron.training.tokenizer.tokenizer._NullTokenizer object at 0x4003c9c52390>, reset_position_ids=False, reset_attention_mask=False, eod_mask_loss=False, goldfish_loss=False, goldfish_k=50, goldfish_h=50, create_attention_mask=True, drop_last_partial_validation_sequence=True, add_extra_token_to_sequence=True, s3_cache_path=None)
+INFO:megatron.core.datasets.gpt_dataset:Build and save the MockGPTDataset train indices
+WARNING:megatron.core.datasets.gpt_dataset:Unable to save MockGPTDataset indexes because path_to_cache is None
+INFO:megatron.core.datasets.gpt_dataset:> total number of samples: 33296
+INFO:megatron.core.datasets.gpt_dataset:> total number of epochs: 1
+INFO:megatron.core.datasets.gpt_dataset:Build and save the MockGPTDataset valid indices
+WARNING:megatron.core.datasets.gpt_dataset:Unable to save MockGPTDataset indexes because path_to_cache is None
+INFO:megatron.core.datasets.gpt_dataset:> total number of samples: 33281
+INFO:megatron.core.datasets.gpt_dataset:> total number of epochs: 1
+INFO:megatron.core.datasets.gpt_dataset:Build and save the MockGPTDataset test indices
+WARNING:megatron.core.datasets.gpt_dataset:Unable to save MockGPTDataset indexes because path_to_cache is None
+INFO:megatron.core.datasets.gpt_dataset:> total number of samples: 33343
+INFO:megatron.core.datasets.gpt_dataset:> total number of epochs: 1
+> finished creating GPT datasets ...
+[after dataloaders are built] datetime: 2025-12-15 13:13:03 
+done with setup ...
+(min, max) time across ranks (ms):
+    model-and-optimizer-setup ......................: (13461.86, 13925.41)
+    train/valid/test-data-iterators-setup ..........: (45.56, 50.74)
+training ...
+[before the start of training step] datetime: 2025-12-15 13:13:03 
+NCCL version 2.28.8+cuda13.0
+NCCL version 2.28.8+cuda13.0
+NCCL version 2.28.8+cuda13.0
+Number of parameters in transformer layers in billions:  2.47
+Number of parameters in embedding layers in billions: 0.20
+Total number of parameters in billions: 2.67
+Number of parameters in most loaded shard in billions: 2.6683
+Theoretical memory footprints: weight and optimizer=45804.76 MB
+ [2025-12-15 13:13:23] iteration        1/      20 | consumed samples:           32 | consumed tokens: 0.000B | elapsed time per iteration (ms): 19128.2 | eta: 0:06:03 | tokens/sec/gpu: 856.5 | throughput per GPU (TFLOP/s/GPU): 15.5 | learning rate: 3.000000E-05 | global batch size:    32 | lm loss: 1.170470E+01 | loss scale: 1.0 | grad norm: 4.182 | number of skipped iterations:   0 | number of nan iterations:   0 |
+[Rank 0] (after 1 iterations) memory (MB) | allocated: 50631.97802734375 | max allocated: 50870.47705078125 | reserved: 53938.0 | max reserved: 53938.0
+ [2025-12-15 13:13:25] iteration        2/      20 | consumed samples:           64 | consumed tokens: 0.000B | elapsed time per iteration (ms): 2869.4 | eta: 0:00:51 | tokens/sec/gpu: 5710.0 | throughput per GPU (TFLOP/s/GPU): 103.5 | learning rate: 6.000000E-05 | global batch size:    32 | lm loss: 1.171407E+01 | loss scale: 1.0 | grad norm: 4.329 | number of skipped iterations:   0 | number of nan iterations:   0 |
+ [2025-12-15 13:13:28] iteration        3/      20 | consumed samples:           96 | consumed tokens: 0.000B | elapsed time per iteration (ms): 2603.4 | eta: 0:00:44 | tokens/sec/gpu: 6293.2 | throughput per GPU (TFLOP/s/GPU): 114.0 | learning rate: 9.000000E-05 | global batch size:    32 | lm loss: 1.115064E+01 | loss scale: 1.0 | grad norm: 2.030 | number of skipped iterations:   0 | number of nan iterations:   0 |
+ [2025-12-15 13:13:31] iteration        4/      20 | consumed samples:          128 | consumed tokens: 0.000B | elapsed time per iteration (ms): 2615.6 | eta: 0:00:41 | tokens/sec/gpu: 6263.9 | throughput per GPU (TFLOP/s/GPU): 113.5 | learning rate: 1.200000E-04 | global batch size:    32 | lm loss: 1.072840E+01 | loss scale: 1.0 | grad norm: 1.256 | number of skipped iterations:   0 | number of nan iterations:   0 |
+ [2025-12-15 13:13:33] iteration        5/      20 | consumed samples:          160 | consumed tokens: 0.000B | elapsed time per iteration (ms): 2598.5 | eta: 0:00:38 | tokens/sec/gpu: 6305.1 | throughput per GPU (TFLOP/s/GPU): 114.3 | learning rate: 1.500000E-04 | global batch size:    32 | lm loss: 1.041323E+01 | loss scale: 1.0 | grad norm: 0.913 | number of skipped iterations:   0 | number of nan iterations:   0 |
+ [2025-12-15 13:13:36] iteration        6/      20 | consumed samples:          192 | consumed tokens: 0.000B | elapsed time per iteration (ms): 2772.9 | eta: 0:00:38 | tokens/sec/gpu: 5908.6 | throughput per GPU (TFLOP/s/GPU): 107.1 | learning rate: 1.485250E-04 | global batch size:    32 | lm loss: 9.919896E+00 | loss scale: 1.0 | grad norm: 0.936 | number of skipped iterations:   0 | number of nan iterations:   0 |
+ [2025-12-15 13:13:39] iteration        7/      20 | consumed samples:          224 | consumed tokens: 0.000B | elapsed time per iteration (ms): 2595.6 | eta: 0:00:33 | tokens/sec/gpu: 6312.3 | throughput per GPU (TFLOP/s/GPU): 114.4 | learning rate: 1.441643E-04 | global batch size:    32 | lm loss: 9.485567E+00 | loss scale: 1.0 | grad norm: 0.794 | number of skipped iterations:   0 | number of nan iterations:   0 |
+ [2025-12-15 13:13:41] iteration        8/      20 | consumed samples:          256 | consumed tokens: 0.001B | elapsed time per iteration (ms): 2589.5 | eta: 0:00:31 | tokens/sec/gpu: 6327.1 | throughput per GPU (TFLOP/s/GPU): 114.7 | learning rate: 1.371086E-04 | global batch size:    32 | lm loss: 9.061828E+00 | loss scale: 1.0 | grad norm: 0.773 | number of skipped iterations:   0 | number of nan iterations:   0 |
+ [2025-12-15 13:13:44] iteration        9/      20 | consumed samples:          288 | consumed tokens: 0.001B | elapsed time per iteration (ms): 2594.7 | eta: 0:00:28 | tokens/sec/gpu: 6314.5 | throughput per GPU (TFLOP/s/GPU): 114.4 | learning rate: 1.276663E-04 | global batch size:    32 | lm loss: 8.760534E+00 | loss scale: 1.0 | grad norm: 0.676 | number of skipped iterations:   0 | number of nan iterations:   0 |
+ [2025-12-15 13:13:46] iteration       10/      20 | consumed samples:          320 | consumed tokens: 0.001B | elapsed time per iteration (ms): 2597.6 | eta: 0:00:25 | tokens/sec/gpu: 6307.5 | throughput per GPU (TFLOP/s/GPU): 114.3 | learning rate: 1.162500E-04 | global batch size:    32 | lm loss: 8.628134E+00 | loss scale: 1.0 | grad norm: 0.514 | number of skipped iterations:   0 | number of nan iterations:   0 |
+ [2025-12-15 13:13:49] iteration       11/      20 | consumed samples:          352 | consumed tokens: 0.001B | elapsed time per iteration (ms): 2586.0 | eta: 0:00:23 | tokens/sec/gpu: 6335.6 | throughput per GPU (TFLOP/s/GPU): 114.8 | learning rate: 1.033586E-04 | global batch size:    32 | lm loss: 8.559188E+00 | loss scale: 1.0 | grad norm: 0.456 | number of skipped iterations:   0 | number of nan iterations:   0 |
+ [2025-12-15 13:13:52] iteration       12/      20 | consumed samples:          384 | consumed tokens: 0.001B | elapsed time per iteration (ms): 2593.6 | eta: 0:00:20 | tokens/sec/gpu: 6317.0 | throughput per GPU (TFLOP/s/GPU): 114.5 | learning rate: 8.955567E-05 | global batch size:    32 | lm loss: 8.412534E+00 | loss scale: 1.0 | grad norm: 0.383 | number of skipped iterations:   0 | number of nan iterations:   0 |
+ [2025-12-15 13:13:54] iteration       13/      20 | consumed samples:          416 | consumed tokens: 0.001B | elapsed time per iteration (ms): 2584.8 | eta: 0:00:18 | tokens/sec/gpu: 6338.7 | throughput per GPU (TFLOP/s/GPU): 114.9 | learning rate: 7.544433E-05 | global batch size:    32 | lm loss: 8.280415E+00 | loss scale: 1.0 | grad norm: 0.335 | number of skipped iterations:   0 | number of nan iterations:   0 |
+ [2025-12-15 13:13:57] iteration       14/      20 | consumed samples:          448 | consumed tokens: 0.001B | elapsed time per iteration (ms): 2591.9 | eta: 0:00:15 | tokens/sec/gpu: 6321.2 | throughput per GPU (TFLOP/s/GPU): 114.6 | learning rate: 6.164135E-05 | global batch size:    32 | lm loss: 8.341743E+00 | loss scale: 1.0 | grad norm: 0.349 | number of skipped iterations:   0 | number of nan iterations:   0 |
+ [2025-12-15 13:13:59] iteration       15/      20 | consumed samples:          480 | consumed tokens: 0.001B | elapsed time per iteration (ms): 2591.1 | eta: 0:00:12 | tokens/sec/gpu: 6323.2 | throughput per GPU (TFLOP/s/GPU): 114.6 | learning rate: 4.875000E-05 | global batch size:    32 | lm loss: 8.216099E+00 | loss scale: 1.0 | grad norm: 0.360 | number of skipped iterations:   0 | number of nan iterations:   0 |
+ [2025-12-15 13:14:02] iteration       16/      20 | consumed samples:          512 | consumed tokens: 0.001B | elapsed time per iteration (ms): 2588.3 | eta: 0:00:10 | tokens/sec/gpu: 6330.1 | throughput per GPU (TFLOP/s/GPU): 114.7 | learning rate: 3.733368E-05 | global batch size:    32 | lm loss: 8.244522E+00 | loss scale: 1.0 | grad norm: 0.270 | number of skipped iterations:   0 | number of nan iterations:   0 |
+ [2025-12-15 13:14:04] iteration       17/      20 | consumed samples:          544 | consumed tokens: 0.001B | elapsed time per iteration (ms): 2587.4 | eta: 0:00:07 | tokens/sec/gpu: 6332.3 | throughput per GPU (TFLOP/s/GPU): 114.8 | learning rate: 2.789135E-05 | global batch size:    32 | lm loss: 8.202124E+00 | loss scale: 1.0 | grad norm: 0.250 | number of skipped iterations:   0 | number of nan iterations:   0 |
+ [2025-12-15 13:14:07] iteration       18/      20 | consumed samples:          576 | consumed tokens: 0.001B | elapsed time per iteration (ms): 2592.6 | eta: 0:00:05 | tokens/sec/gpu: 6319.6 | throughput per GPU (TFLOP/s/GPU): 114.5 | learning rate: 2.083568E-05 | global batch size:    32 | lm loss: 8.212700E+00 | loss scale: 1.0 | grad norm: 0.255 | number of skipped iterations:   0 | number of nan iterations:   0 |
+ [2025-12-15 13:14:10] iteration       19/      20 | consumed samples:          608 | consumed tokens: 0.001B | elapsed time per iteration (ms): 2591.5 | eta: 0:00:02 | tokens/sec/gpu: 6322.1 | throughput per GPU (TFLOP/s/GPU): 114.6 | learning rate: 1.647504E-05 | global batch size:    32 | lm loss: 8.195117E+00 | loss scale: 1.0 | grad norm: 0.285 | number of skipped iterations:   0 | number of nan iterations:   0 |
+ [2025-12-15 13:14:12] iteration       20/      20 | consumed samples:          640 | consumed tokens: 0.001B | elapsed time per iteration (ms): 2597.2 | eta: 0:00:00 | tokens/sec/gpu: 6308.2 | throughput per GPU (TFLOP/s/GPU): 114.3 | learning rate: 1.500000E-05 | global batch size:    32 | lm loss: 8.169559E+00 | loss scale: 1.0 | grad norm: 0.229 | number of skipped iterations:   0 | number of nan iterations:   0 |
+Training finished after 20 iterations; Canceling pending scheduled jobs.
+===== DONE: Test 3B Semigroup Mock =====

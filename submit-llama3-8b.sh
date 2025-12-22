@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --account=a-a06
+#SBATCH --job-name=Ls-account
 #SBATCH --time=00:19:59
 #SBATCH --job-name=llama-8b
 #SBATCH --output=/iopsstor/scratch/cscs/%u/Megatron-LM/logs/slurm/training/%x-%j.out
@@ -10,7 +10,7 @@
 #SBATCH --gpus-per-node=4
 #SBATCH --cpus-per-task=72
 #SBATCH --mem=460000
-#SBATCH --environment=/capstor/store/cscs/swissai/a06/containers/NGC-PyTorch/ngc_pt_jan.toml	# Vanilla 25.01 PyTorch NGC Image 
+######SBATCH --environment=/capstor/store/cscs/swissai/a06/containers/NGC-PyTorch/ngc_pt_jan.toml	# Vanilla 25.01 PyTorch NGC Image 
 #SBATCH --signal=SIGUSR2@600	# Send SIGUSR2 600 seconds before hitting the time limit
 #SBATCH --no-requeue	# Prevent Slurm to requeue the job if the execution crashes (e.g. node failure) so we don't loose the logs
 

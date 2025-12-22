@@ -5,14 +5,14 @@
 #SBATCH --ntasks=4
 #SBATCH --gpus-per-node=4
 #SBATCH --account=large-sc-2
-#SBATCH --environment=/iopsstor/scratch/cscs/ooikonomou/ngc_pt_jan.toml
-#SBATCH --output=/iopsstor/scratch/cscs/ooikonomou/Megatron-LM-new-attention/logs/profile-3b-semigroup-1n4-%j.out
-#SBATCH --error=/iopsstor/scratch/cscs/ooikonomou/Megatron-LM-new-attention/logs/profile-3b-semigroup-1n4-%j.err
+#SBATCH --environment=/iopsstor/scratch/cscs/gkissas/ngc_pt_jan.toml
+#SBATCH --output=/iopsstor/scratch/cscs/gkissas/Megatron-LM-new-attention/logs/profile-3b-semigroup-1n4-%j.out
+#SBATCH --error=/iopsstor/scratch/cscs/gkissas/Megatron-LM-new-attention/logs/profile-3b-semigroup-1n4-%j.err
 
 echo "===== PROFILE: 3B SEMIGROUP (1N4G) ====="
 
-MEGATRON_DIR=/iopsstor/scratch/cscs/ooikonomou/Megatron-LM-new-attention
-DATA_PATH=/users/ooikonomou/scratch/Megatron-LM-new-attention/datasets/train_data_meg_text_document
+MEGATRON_DIR=/iopsstor/scratch/cscs/gkissas/Megatron-LM-new-attention
+DATA_PATH=/users/gkissas/scratch/Megatron-LM-new-attention/datasets/train_data_meg_text_document
 TOKENIZER=alehc/swissai-tokenizer
 LOG_DIR=$MEGATRON_DIR/logs/profile-3b-semigroup-1n4-$SLURM_JOB_ID
 NSYS_OUT=$LOG_DIR/nsight-semigroup

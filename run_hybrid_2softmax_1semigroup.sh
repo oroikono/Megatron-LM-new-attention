@@ -5,16 +5,22 @@
 #SBATCH --ntasks=4
 #SBATCH --gpus-per-node=4
 #SBATCH --account=large-sc-2
-#SBATCH --environment=/iopsstor/scratch/cscs/ooikonomou/ngc_pt_jan.toml
-#SBATCH --output=/iopsstor/scratch/cscs/ooikonomou/Megatron-LM-new-attention-wt/logs/hybrid-2softmax-1semigroup-%j.out
-#SBATCH --error=/iopsstor/scratch/cscs/ooikonomou/Megatron-LM-new-attention-wt/logs/hybrid-2softmax-1semigroup-%j.err
+#SBATCH --environment=/iopsstor/scratch/cscs/gkissas/ngc_pt_jan.toml
+#SBATCH --output=/iopsstor/scratch/cscs/gkissas/Megatron-LM-new-attention/logs/hybrid-2softmax-1semigroup-%j.out
+#SBATCH --error=/iopsstor/scratch/cscs/gkissas/Megatron-LM-new-attention/logs/hybrid-2softmax-1semigroup-%j.err
 # George experiment: 2 softmax + 1 semigroup layers, repeating
 
-MEGATRON_DIR=/iopsstor/scratch/cscs/ooikonomou/Megatron-LM-new-attention-wt
-DATA_PATH=/users/ooikonomou/scratch/Megatron-LM-new-attention/datasets/train_data_meg_text_document
+# Prevent conda from auto-activating
+unset CONDA_DEFAULT_ENV
+unset CONDA_PREFIX
+# Clear Python paths that might point to conda
+unset PYTHONPATH
+
+MEGATRON_DIR=/iopsstor/scratch/cscs/gkissas/Megatron-LM-new-attention
+DATA_PATH=/users/gkissas/scratch/Megatron-LM-new-attention/datasets/train_data_meg_text_document
 TOKENIZER=alehc/swissai-tokenizer
-CKPT_DIR=$MEGATRON_DIR/checkpoints/hybrid-2softmax-1semigroup
-LOG_DIR=$MEGATRON_DIR/logs/hybrid-2softmax-1semigroup-$SLURM_JOB_ID
+CKPT_DIR=$MEGATRON_DIR/checkpoints/semigroup-with-warmup-dt-fix
+LOG_DIR=$MEGATRON_DIR/logs/semigroup-with-warmup-dt-fix-$SLURM_JOB_ID
 
 mkdir -p $LOG_DIR $CKPT_DIR
 
@@ -28,7 +34,6 @@ export UCX_NET_DEVICES=all
 export UCX_TLS=tcp,cuda_copy,cuda_ipc
 export NCCL_DEBUG=WARN
 export CUDA_VISIBLE_DEVICES=0,1,2,3
-export WANDB_API_KEY=ad89856ea24906ac890a2f439a5c6b65791175b7
 
 cd $MEGATRON_DIR
 pip install transformers --quiet --break-system-packages
@@ -41,8 +46,8 @@ torchrun --nproc_per_node=4 --master_addr=$MASTER_ADDR --master_port=$MASTER_POR
     --transformer-impl local --no-persist-layer-norm \
     --tensor-model-parallel-size 1 --pipeline-model-parallel-size 1 \
     --micro-batch-size 1 --global-batch-size 32 --bf16 \
-    --train-iters 60000 --lr 2.0e-4 --lr-decay-style cosine --min-lr 2.0e-5 \
-    --lr-warmup-iters 0 --weight-decay 0.1 --clip-grad 1.0 \
+    --train-iters 60000 --lr 1.0e-4 --lr-decay-style cosine --min-lr 1.0e-5 \
+    --lr-warmup-iters 2000 --weight-decay 0.1 --clip-grad 1.0 \
     --data-path $DATA_PATH --tokenizer-type HuggingFaceTokenizer --tokenizer-model $TOKENIZER \
     --split 100,0,0 --log-interval 10 --log-throughput \
     --tensorboard-dir $LOG_DIR/tensorboard --trigger-path $LOG_DIR \
